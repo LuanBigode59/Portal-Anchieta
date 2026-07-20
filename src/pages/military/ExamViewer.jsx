@@ -80,6 +80,22 @@ export default function ExamViewer() {
     return () => clearInterval(timerRef.current);
   }, [loading, exam, result, timeLeft]);
 
+  // Anti-Cheat Effect
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && !loading && exam && !result && !isSubmitting) {
+        // Anti-cheat detectou saída da página
+        sendNotification("MODO ANTI-CHEAT ATIVADO: Você saiu da página ou trocou de aba. Sua prova foi anulada e uma tentativa foi perdida.", "erro");
+        handleSubmit(null, true, true); // isAutoSubmit = true, isCheating = true
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [loading, exam, result, isSubmitting]);
+
   const handleSelect = (qIndex, aIndex) => {
     if (result) return;
     setAnswers(prev => ({ ...prev, [qIndex]: aIndex }));
@@ -93,11 +109,11 @@ export default function ExamViewer() {
     return Math.round((correctCount / exam.perguntas.length) * 100);
   };
 
-  const handleSubmit = async (e, isAutoSubmit = false) => {
+  const handleSubmit = async (e, isAutoSubmit = false, isCheating = false) => {
     if (e) e.preventDefault();
     if (result) return;
     
-    if (!isAutoSubmit && Object.keys(answers).length < exam.perguntas.length) {
+    if (!isAutoSubmit && !isCheating && Object.keys(answers).length < exam.perguntas.length) {
       if (!window.confirm("Você não respondeu todas as perguntas. Deseja enviar mesmo assim? As não respondidas serão consideradas erradas.")) {
         return;
       }
@@ -106,7 +122,7 @@ export default function ExamViewer() {
     setIsSubmitting(true);
     clearInterval(timerRef.current);
 
-    const score = calculateScore();
+    const score = isCheating ? 0 : calculateScore();
     const isApproved = score >= exam.nota_aprovacao;
 
     try {

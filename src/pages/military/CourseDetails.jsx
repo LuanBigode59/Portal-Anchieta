@@ -19,6 +19,7 @@ import {
   MdQuiz,
   MdPictureAsPdf,
   MdSlideshow,
+  MdWarning
 } from 'react-icons/md';
 
 // Fallback: gera módulos placeholder se não houver módulos no banco
@@ -134,11 +135,11 @@ export default function CourseDetails() {
       </button>
 
       {/* ===== CABEÇALHO DO CURSO ===== */}
-      <div 
+      <div
         className="bg-mil-dark border border-mil-border rounded-2xl p-6 md:p-8 mb-6 flex flex-col md:flex-row justify-between items-end gap-6 relative overflow-hidden bg-cover bg-center min-h-[250px] md:min-h-[300px]"
         style={{
-          backgroundImage: course.imagem_url 
-            ? `linear-gradient(to top, rgba(13, 17, 23, 1) 0%, rgba(13, 17, 23, 0.5) 50%, rgba(13, 17, 23, 0.1) 100%), url(${course.imagem_url})` 
+          backgroundImage: course.imagem_url
+            ? `linear-gradient(to top, rgba(13, 17, 23, 1) 0%, rgba(13, 17, 23, 0.5) 50%, rgba(13, 17, 23, 0.1) 100%), url(${course.imagem_url})`
             : 'none'
         }}
       >
@@ -201,13 +202,12 @@ export default function CourseDetails() {
                   key={mod.id}
                   onClick={() => unlocked && setActiveModuleId(mod.id)}
                   disabled={!unlocked}
-                  className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${
-                    isActive
+                  className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${isActive
                       ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
                       : !unlocked
-                      ? 'border-mil-border/40 bg-mil-black/50 opacity-50 cursor-not-allowed'
-                      : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
-                  }`}
+                        ? 'border-mil-border/40 bg-mil-black/50 opacity-50 cursor-not-allowed'
+                        : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
+                    }`}
                 >
                   <div className="flex items-center gap-2 mb-1.5">
                     {!unlocked ? (
@@ -220,17 +220,15 @@ export default function CourseDetails() {
                       />
                     )}
                     <span
-                      className={`text-[10px] font-bold uppercase tracking-wider ${
-                        isActive ? 'text-army-green-light' : 'text-gray-600'
-                      }`}
+                      className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-army-green-light' : 'text-gray-600'
+                        }`}
                     >
                       Módulo {mod.ordem || modules.indexOf(mod) + 1}
                     </span>
                   </div>
                   <span
-                    className={`text-sm leading-snug ${
-                      isActive ? 'text-white font-semibold' : 'text-gray-400'
-                    }`}
+                    className={`text-sm leading-snug ${isActive ? 'text-white font-semibold' : 'text-gray-400'
+                      }`}
                   >
                     {mod.titulo}
                   </span>
@@ -252,11 +250,10 @@ export default function CourseDetails() {
                 {course.pdf_url && (
                   <button
                     onClick={() => setActiveModuleId('pdf')}
-                    className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${
-                      activeModuleId === 'pdf'
+                    className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${activeModuleId === 'pdf'
                         ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
                         : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
                       <MdPictureAsPdf className={`text-sm ${activeModuleId === 'pdf' ? 'text-army-green-light' : 'text-gray-600'}`} />
@@ -272,11 +269,10 @@ export default function CourseDetails() {
                 {course.slides_url && (
                   <button
                     onClick={() => setActiveModuleId('slides')}
-                    className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${
-                      activeModuleId === 'slides'
+                    className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${activeModuleId === 'slides'
                         ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
                         : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
                       <MdSlideshow className={`text-sm ${activeModuleId === 'slides' ? 'text-army-green-light' : 'text-gray-600'}`} />
@@ -329,19 +325,18 @@ export default function CourseDetails() {
                 </h2>
               </div>
               <span
-                className={`text-[10px] font-bold tracking-wider px-3 py-1.5 rounded border uppercase whitespace-nowrap ${
-                  completedModules.includes(activeModuleId)
+                className={`text-[10px] font-bold tracking-wider px-3 py-1.5 rounded border uppercase whitespace-nowrap ${completedModules.includes(activeModuleId)
                     ? 'border-green-700/50 text-green-400 bg-green-900/10'
                     : isModuleUnlocked(activeModule)
-                    ? 'border-gold/50 text-gold bg-gold/10'
-                    : 'border-red-800/50 text-red-400 bg-red-900/10'
-                }`}
+                      ? 'border-gold/50 text-gold bg-gold/10'
+                      : 'border-red-800/50 text-red-400 bg-red-900/10'
+                  }`}
               >
                 {completedModules.includes(activeModuleId)
                   ? 'CONCLUÍDO'
                   : isModuleUnlocked(activeModule)
-                  ? 'EM ANDAMENTO'
-                  : 'BLOQUEADO'}
+                    ? 'EM ANDAMENTO'
+                    : 'BLOQUEADO'}
               </span>
             </div>
 
@@ -349,7 +344,7 @@ export default function CourseDetails() {
             {activeModule.video_url ? (
               <div className="relative aspect-video bg-black w-full flex flex-col justify-center items-center overflow-hidden">
                 {activeModule.video_url.includes('youtube.com') || activeModule.video_url.includes('youtu.be') ? (
-                  <iframe 
+                  <iframe
                     className="w-full h-full"
                     src={activeModule.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
                     title="YouTube video player"
@@ -358,8 +353,8 @@ export default function CourseDetails() {
                     allowFullScreen
                   ></iframe>
                 ) : (
-                  <video 
-                    controls 
+                  <video
+                    controls
                     controlsList="nodownload"
                     className="w-full h-full object-contain"
                     src={activeModule.video_url}
@@ -424,6 +419,17 @@ export default function CourseDetails() {
               <MdQuiz className="text-gold" /> Avaliações do Curso
             </h3>
           </div>
+          <div className="bg-red-500/10 border-b border-red-500/20 p-4">
+            <div className="flex items-start gap-3">
+              <MdWarning className="text-red-500 text-xl flex-shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-bold text-red-400 uppercase tracking-widest mb-1">Aviso: Sistema Anti-Cheat</h4>
+                <p className="text-xs text-red-300/80 leading-relaxed">
+                  As provas deste curso possuem sistema de monitoramento. Ao iniciar a prova, você não poderá sair da tela, trocar de aba ou minimizar a janela. Caso faça isso, a prova será anulada imediatamente com nota 0 e você perderá uma tentativa.
+                </p>
+              </div>
+            </div>
+          </div>
           <div className="divide-y divide-mil-border bg-mil-black/50">
             {exams.map((exam) => {
               const examAttempts = attempts[exam.id] || [];
@@ -454,11 +460,10 @@ export default function CourseDetails() {
                       {examAttempts.map((att, idx) => (
                         <span
                           key={idx}
-                          className={`text-[9px] font-bold px-2 py-0.5 rounded ${
-                            att.aprovado
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded ${att.aprovado
                               ? 'bg-green-500/20 text-green-400'
                               : 'bg-red-500/20 text-red-400'
-                          }`}
+                            }`}
                         >
                           T{idx + 1}: {att.nota}
                         </span>
@@ -484,9 +489,8 @@ export default function CourseDetails() {
                     <button
                       onClick={() => navigate(`/militar/provas/${exam.id}`)}
                       disabled={passed || isBlocked}
-                      className={`btn-gold !py-2 !px-6 !text-[10px] ${
-                        passed || isBlocked ? 'opacity-50 cursor-not-allowed grayscale' : ''
-                      }`}
+                      className={`btn-gold !py-2 !px-6 !text-[10px] ${passed || isBlocked ? 'opacity-50 cursor-not-allowed grayscale' : ''
+                        }`}
                     >
                       {passed ? 'Ver Resultado' : 'Iniciar Prova'}
                     </button>
