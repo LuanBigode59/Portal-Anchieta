@@ -209,6 +209,8 @@ export default function Chat() {
     if (window.confirm("Deseja deletar esta mensagem?")) {
       try {
         await chatService.deleteMessage(id);
+        // Atualiza a tela imediatamente sem precisar recarregar o chat
+        setMessages(prev => prev.map(m => m.id === id ? { ...m, deleted: true } : m));
       } catch (err) {
         sendNotification("Erro ao apagar mensagem.", "erro");
       }
