@@ -443,13 +443,13 @@ export default function CourseDetails() {
               let isCooldown = false;
               let cooldownMin = 0;
               
-              if (!passed && lastAttempt) {
-                const localBlockStr = localStorage.getItem(`exam_block_${exam.id}`);
-                const localBlockTime = localBlockStr ? parseInt(localBlockStr, 10) : 0;
-                
-                const attemptTime = new Date(lastAttempt.created_at || Date.now()).getTime();
-                const mostRecentBlock = Math.max(attemptTime, localBlockTime);
-                
+              const localBlockStr = localStorage.getItem(`exam_block_${exam.id}`);
+              const localBlockTime = localBlockStr ? parseInt(localBlockStr, 10) : 0;
+              
+              const lastAttemptTime = lastAttempt ? new Date(lastAttempt.created_at || Date.now()).getTime() : 0;
+              const mostRecentBlock = Math.max(lastAttemptTime, localBlockTime);
+              
+              if (!passed && mostRecentBlock > 0) {
                 const diffMs = Date.now() - mostRecentBlock;
                 const cooldownMs = 60 * 60 * 1000; // 1 hora
                 if (diffMs < cooldownMs) {
