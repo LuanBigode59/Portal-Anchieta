@@ -594,15 +594,21 @@ export default function Dashboard() {
           {pendingDocs.length === 0 ? (
             <p className="text-sm text-gray-500 text-center py-4 border border-dashed border-gray-800 rounded-lg">Não há documentos pendentes.</p>
           ) : (
-            pendingDocs.map(doc => (
-              <label key={doc.id} className="flex items-center gap-3 p-3 rounded-lg bg-mil-black/50 border border-gray-800 hover:border-gold/30 cursor-pointer transition-colors">
-                <input type="checkbox" checked={selectedDocs.includes(doc.id)} onChange={() => toggleDocSelection(doc.id)} className="w-4 h-4 accent-army-green rounded" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-200 font-bold uppercase">{doc.tipo}: {doc.titulo}</p>
-                  <p className="text-[10px] text-gray-500 font-mono">Criado em: {new Date(doc.data_criacao).toLocaleDateString('pt-BR')}</p>
-                </div>
-              </label>
-            ))
+            pendingDocs.map(doc => {
+              const autor = doc.dados?.autor_nome || (doc.tipo === 'certificado' ? doc.dados?.target_militar_nome : 'Sistema');
+              return (
+                <label key={doc.id} className="flex items-center gap-3 p-3 rounded-lg bg-mil-black/50 border border-gray-800 hover:border-gold/30 cursor-pointer transition-colors">
+                  <input type="checkbox" checked={selectedDocs.includes(doc.id)} onChange={() => toggleDocSelection(doc.id)} className="w-4 h-4 accent-army-green rounded" />
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-200 font-bold uppercase">{doc.tipo}: {doc.titulo}</p>
+                    <p className="text-[10px] text-gray-500 font-mono">
+                      Criado em: {new Date(doc.data_criacao).toLocaleDateString('pt-BR')} 
+                      <span className="text-gray-400 font-bold ml-1">por {autor}</span>
+                    </p>
+                  </div>
+                </label>
+              );
+            })
           )}
         </div>
       </ActionModal>
