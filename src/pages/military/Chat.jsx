@@ -198,6 +198,8 @@ export default function Chat() {
   const saveEdit = async (id) => {
     try {
       await chatService.updateMessage(id, editContent);
+      // Atualiza a tela imediatamente
+      setMessages(prev => prev.map(m => m.id === id ? { ...m, content: editContent, edited: true } : m));
       setEditingMsgId(null);
       setEditContent('');
     } catch (err) {
