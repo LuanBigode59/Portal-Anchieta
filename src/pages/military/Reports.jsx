@@ -64,7 +64,7 @@ export default function Reports() {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      await signatureService.createDocument({
+      const newDoc = await signatureService.createDocument({
         tipo: 'relatorio',
         titulo: `RSO - Prefixo ${formData.prefixo}`,
         dados: {
@@ -72,7 +72,14 @@ export default function Reports() {
           autor_nome: user.nome
         }
       });
-      sendNotification("RSO enviado para o Comando Geral!", "sucesso");
+      
+      // Assinatura automática para RSO ficar disponível imediatamente
+      await signatureService.signDocument(newDoc.id, {
+        nome: "Comando do 2º BP Choque",
+        patente: "Auto-Homologação do Sistema"
+      });
+
+      sendNotification("RSO homologado e publicado com sucesso!", "sucesso");
       setFormData(initialFormState);
       setShowCreateModal(false);
       loadReports();
