@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Topbar from '../../components/layout/Topbar';
-import { MdDescription, MdAdd, MdClose, MdPictureAsPdf, MdSave, MdAssignmentTurnedIn } from 'react-icons/md';
+import { MdDescription, MdAdd, MdClose, MdPictureAsPdf, MdSave, MdAssignmentTurnedIn, MdContentCopy, MdDelete } from 'react-icons/md';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { signatureService } from '../../services/signatureService';
@@ -229,6 +229,74 @@ export default function Reports() {
     }
   };
 
+  const handleCopyText = async (report) => {
+    try {
+      const d = report.dados;
+      const text = `
+=== RELATÓRIO DE SERVIÇO OPERACIONAL (RSO) ===
+Título: ${report.titulo}
+
+[ DADOS DO SERVIÇO ]
+Data: ${d.dataServico || 'N/A'}
+Oficial Resp.: ${d.autor_nome || 'N/A'}
+Viatura: ${d.viatura || 'N/A'}
+Prefixo: ${d.prefixo || 'N/A'}
+
+[ GUARNIÇÃO ]
+${d.guarnicao || 'N/A'}
+
+[ ESTATÍSTICAS ]
+BOPMs: ${d.bopm || 0}
+Abordagens: ${d.abordagens || 0}
+Prisões: ${d.prisoes || 0}
+Apoios: ${d.apoios || 0}
+Ocorrências: ${d.ocorrencias || 0}
+Obs. Estatísticas: ${d.obsEstatisticas || 'Nenhuma.'}
+
+[ ILÍCITOS APREENDIDOS ]
+${d.ilicitos || 'Nenhum material apreendido.'}
+
+[ SUPERVISÃO ]
+${d.supervisao || 'N/A'}
+
+[ INÍCIO/TÉRMINO ]
+Início: ${d.inicioPatrulhamento || 'N/A'}
+Término: ${d.terminoPatrulhamento || 'N/A'}
+
+[ OBSERVAÇÕES FINAIS ]
+${d.obsFinais || 'Nenhuma.'}
+
+[ ASSINATURA E VALIDAÇÃO ]
+Assinado por: ${report.assinatura_nome} (${report.assinatura_patente})
+Cód. Validação: ${report.codigo_autenticidade}
+Data/Hora: ${new Date(report.assinatura_data).toLocaleString('pt-BR')}
+Hash: ${report.hash_seguranca}
+==============================================
+      `.trim();
+      
+      await navigator.clipboard.writeText(text);
+      sendNotification("Texto do RSO copiado para a área de transferência!", "sucesso");
+    } catch (err) {
+      console.error("Erro ao copiar texto:", err);
+      sendNotification("Erro ao copiar texto.", "erro");
+    }
+  };
+
+  const handleDeleteReport = async (reportId) => {
+    if (!window.confirm("ATENÇÃO: Deseja realmente DELETAR este RSO do sistema? Esta ação não pode ser desfeita.")) return;
+    try {
+      await signatureService.deleteDocument(reportId);
+      setReports(reports.filter(r => r.id !== reportId));
+      setSelectedReport(null);
+      sendNotification("RSO apagado com sucesso.", "sucesso");
+    } catch (err) {
+      console.error(err);
+      sendNotification("Erro ao apagar RSO.", "erro");
+    }
+  };
+
+  const isComando = user && ['capitao', 'major', 'tenente_coronel', 'coronel'].includes(user.patente?.toLowerCase());
+
   return (
     <div className="animate-fadeIn pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -405,6 +473,14 @@ export default function Reports() {
             <div className="flex justify-between items-center p-5 border-b border-gray-800 sticky top-0 bg-mil-dark z-20">
               <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><MdDescription className="text-gold" /> {selectedReport.titulo}</h2>
               <div className="flex items-center gap-2">
+                {isComando && (
+                  <button onClick={() => handleDeleteReport(selectedReport.id)} className="btn-secondary !py-1.5 !px-3 !text-[10px] flex items-center gap-1 hover:!bg-red-500/20 hover:!text-red-500 hover:!border-red-500/30" title="Apagar RSO">
+                    <MdDelete /> Apagar
+                  </button>
+                )}
+                <button onClick={() => handleCopyText(selectedReport)} className="btn-secondary !py-1.5 !px-3 !text-[10px] flex items-center gap-1 hover:text-white" title="Copiar Texto">
+                  <MdContentCopy /> Copiar Texto
+                </button>
                 <button onClick={() => generatePDF(selectedReport)} className="btn-gold !py-1.5 !px-3 !text-[10px] flex items-center gap-1">
                   <MdPictureAsPdf /> Baixar RSO
                 </button>
