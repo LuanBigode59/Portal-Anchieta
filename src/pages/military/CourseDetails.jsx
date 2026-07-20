@@ -436,7 +436,29 @@ export default function CourseDetails() {
               const passed = examAttempts.some((a) => a.aprovado);
               const maxAttempts = exam.tentativas_permitidas;
               const attemptsLeft = maxAttempts - examAttempts.length;
-              const isBlocked = !passed && attemptsLeft <= 0;
+              const isBlockedByAttempts = !passed && attemptsLeft <= 0;
+              
+              // Cooldown de 1 hora
+              const lastAttempt = examAttempts[examAttempts.length - 1];
+              let isCooldown = false;
+              let cooldownMin = 0;
+              
+              if (!passed && lastAttempt) {
+                const localBlockStr = localStorage.getItem(`exam_block_${exam.id}`);
+                const localBlockTime = localBlockStr ? parseInt(localBlockStr, 10) : 0;
+                
+                const attemptTime = new Date(lastAttempt.created_at || Date.now()).getTime();
+                const mostRecentBlock = Math.max(attemptTime, localBlockTime);
+                
+                const diffMs = Date.now() - mostRecentBlock;
+                const cooldownMs = 60 * 60 * 1000; // 1 hora
+                if (diffMs < cooldownMs) {
+                  isCooldown = true;
+                  cooldownMin = Math.ceil((cooldownMs - diffMs) / 60000);
+                }
+              }
+
+              const isBlocked = isBlockedByAttempts || isCooldown;
 
               return (
                 <div
@@ -476,9 +498,13 @@ export default function CourseDetails() {
                       <span className="text-xs font-bold text-green-500 uppercase tracking-widest mb-1">
                         Aprovado
                       </span>
-                    ) : isBlocked ? (
+                    ) : isBlockedByAttempts ? (
                       <span className="text-xs font-bold text-red-500 uppercase tracking-widest mb-1">
-                        Bloqueado
+                        Esgotado
+                      </span>
+                    ) : isCooldown ? (
+                      <span className="text-xs font-bold text-yellow-500 uppercase tracking-widest mb-1">
+                        Aguarde {cooldownMin} min
                       </span>
                     ) : (
                       <span className="text-[10px] text-gray-500 uppercase tracking-widest mb-2">
@@ -492,7 +518,7 @@ export default function CourseDetails() {
                       className={`btn-gold !py-2 !px-6 !text-[10px] ${passed || isBlocked ? 'opacity-50 cursor-not-allowed grayscale' : ''
                         }`}
                     >
-                      {passed ? 'Ver Resultado' : 'Iniciar Prova'}
+                      {passed ? 'Ver Resultado' : isCooldown ? 'Em Espera' : 'Iniciar Prova'}
                     </button>
                   </div>
                 </div>

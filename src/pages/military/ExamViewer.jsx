@@ -82,11 +82,24 @@ export default function ExamViewer() {
 
   // Anti-Cheat Effect
   useEffect(() => {
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = async () => {
       if (document.hidden && !loading && exam && !result && !isSubmitting) {
         // Anti-cheat detectou saída da página
-        sendNotification("MODO ANTI-CHEAT ATIVADO: Você saiu da página ou trocou de aba. Sua prova foi anulada e uma tentativa foi perdida.", "erro");
-        handleSubmit(null, true, true); // isAutoSubmit = true, isCheating = true
+        
+        // Bloqueia no localStorage (1 hora)
+        localStorage.setItem(`exam_block_${exam.id}`, Date.now().toString());
+        
+        // Tenta enviar a nota 0 para o banco, mas não trava se der erro (RLS, etc)
+        try {
+          await handleSubmit(null, true, true); 
+        } catch (e) {
+          console.error("Erro ao salvar penalidade no banco:", e);
+        }
+        
+        sendNotification("MODO ANTI-CHEAT ATIVADO: Você saiu da página ou trocou de aba. Sua prova foi anulada e bloqueada por 1 hora.", "erro");
+        
+        // Fecha a prova imediatamente e volta pro curso
+        navigate(`/militar/cursos/${exam.curso_id}`);
       }
     };
 
@@ -94,7 +107,7 @@ export default function ExamViewer() {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [loading, exam, result, isSubmitting]);
+  }, [loading, exam, result, isSubmitting, navigate, sendNotification]);
 
   const handleSelect = (qIndex, aIndex) => {
     if (result) return;
