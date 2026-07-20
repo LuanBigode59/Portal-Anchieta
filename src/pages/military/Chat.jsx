@@ -229,7 +229,8 @@ export default function Chat() {
   const filteredMessages = messages.filter(m => {
     const matchesSearch = m.content.toLowerCase().includes(searchQuery.toLowerCase()) || m.user_nome.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesPin = showPinnedOnly ? m.pinned : true;
-    return matchesSearch && matchesPin;
+    const notDeleted = !m.deleted;
+    return matchesSearch && matchesPin && notDeleted;
   });
 
   return (
