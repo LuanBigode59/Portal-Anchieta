@@ -21,7 +21,8 @@ export const userService = {
       historico: m.historico || [],
       status: m.status || 'Ativo',
       companhia: m.companhia || 'QG / Comando',
-      horasServico: m.horas_servico || '0h'
+      horasServico: m.horas_servico || '0h',
+      bancoHoras: m.banco_horas || 0
     })) || [];
   },
 
@@ -43,7 +44,8 @@ export const userService = {
       historico: m.historico || [],
       status: m.status || 'Ativo',
       companhia: m.companhia || 'QG / Comando',
-      horasServico: m.horas_servico || '0h'
+      horasServico: m.horas_servico || '0h',
+      bancoHoras: m.banco_horas || 0
     })) || [];
   },
 
@@ -66,7 +68,8 @@ export const userService = {
       historico: m.historico || [],
       status: m.status || 'Exonerado',
       companhia: m.companhia || 'QG / Comando',
-      horasServico: m.horas_servico || '0h'
+      horasServico: m.horas_servico || '0h',
+      bancoHoras: m.banco_horas || 0
     })) || [];
   },
 
@@ -94,6 +97,7 @@ export const userService = {
        data.status = data.status || 'Ativo';
        data.companhia = data.companhia || 'QG / Comando';
        data.horasServico = data.horas_servico || '0h';
+       data.bancoHoras = data.banco_horas || 0;
     }
     return data;
   },

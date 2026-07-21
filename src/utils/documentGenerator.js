@@ -23,30 +23,37 @@ export const generatePDF = async (docObj) => {
 
       pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
 
-      const { target_militar_nome, target_militar_id, curso_nome } = docObj.dados;
-      const nomeMilitar = target_militar_nome || target_militar_id || 'Militar não identificado';
-      const cursoStr = curso_nome || 'Curso não especificado';
+      const { target_militar_nome, target_militar_id, curso_nome, data, codigo } = docObj.dados;
+      const nomeMilitar = target_militar_nome || target_militar_id || 'NOME DO ALUNO';
+      const cursoStr = curso_nome || 'CURSO DE ESPECIALIZAÇÃO';
       
       pdf.setFont("helvetica", "bold");
       
-      // Nome do militar
-      pdf.setTextColor(40, 40, 40);
-      pdf.setFontSize(22);
+      // Nome do militar (top)
+      pdf.setTextColor(17, 17, 17);
+      pdf.setFontSize(26);
       pdf.text(nomeMilitar.toUpperCase(), 148.5, 96, { align: 'center' });
       
-      // Nome do curso
-      pdf.setTextColor(201, 168, 76); // Goldish
-      pdf.setFontSize(18);
-      pdf.text(cursoStr.toUpperCase(), 148.5, 125, { align: 'center' });
+      // Nome do curso (middle)
+      pdf.setFontSize(20);
+      pdf.text(cursoStr.toUpperCase(), 148.5, 120, { align: 'center' });
       
       // Assinatura do instrutor (left)
-      const nomeInstrutor = docObj.dados.instrutor || docObj.assinatura_nome || "Comandante";
-      pdf.setTextColor(40, 40, 40);
-      pdf.setFontSize(12);
-      pdf.text(nomeInstrutor.toUpperCase(), 75, 162, { align: 'center' });
+      const nomeInstrutor = docObj.dados.instrutor || docObj.assinatura_nome || "NOME DO INSTRUTOR";
+      pdf.setFontSize(16);
+      pdf.setFont("helvetica", "italic");
+      pdf.text(nomeInstrutor, 91.4, 171.5, { align: 'center' });
       
       // Assinatura do Aluno (right)
-      pdf.text(nomeMilitar.toUpperCase(), 222, 162, { align: 'center' });
+      pdf.text(nomeMilitar, 207, 171.5, { align: 'center' });
+
+      // Emissão e Validação
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(8);
+      pdf.setTextColor(85, 85, 85);
+      const dataStr = data || new Date().toLocaleDateString('pt-BR');
+      const codStr = codigo || 'CHQ-000000';
+      pdf.text(`Emissão: ${dataStr}\nValidação: ${codStr}`, 287, 200, { align: 'right' });
 
       pdf.save(`Certificado_${docObj.id.split('-')[0]}.pdf`);
       return;

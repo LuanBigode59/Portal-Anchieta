@@ -47,6 +47,16 @@ export default function MilitarProfile() {
   const rankData = getRankById(militar.patente);
   const isAtivo = militar.status === 'Ativo';
 
+  const formatBancoHoras = (segundos) => {
+    if (!segundos) return '0h';
+    const horas = Math.floor(segundos / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    if (horas > 0) {
+      return `${horas}h ${minutos > 0 ? `${minutos}m` : ''}`.trim();
+    }
+    return `${minutos}m`;
+  };
+
   const tabs = [
     { id: 'geral', label: 'Visão Geral', icon: <MdAssignment /> },
     { id: 'cursos', label: 'Cursos', icon: <MdSchool /> },
@@ -100,7 +110,7 @@ export default function MilitarProfile() {
               </div>
               <div>
                 <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Horas de Serviço</p>
-                <p className="text-sm font-mono text-gray-300">{militar.horasServico}</p>
+                <p className="text-sm font-mono text-gray-300">{formatBancoHoras(militar.bancoHoras)}</p>
               </div>
             </div>
           </div>

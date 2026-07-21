@@ -19,7 +19,8 @@ import {
   MdQuiz,
   MdPictureAsPdf,
   MdSlideshow,
-  MdWarning
+  MdWarning,
+  MdOpenInNew
 } from 'react-icons/md';
 
 // Fallback: gera módulos placeholder se não houver módulos no banco
@@ -298,8 +299,21 @@ export default function CourseDetails() {
                 <MdPictureAsPdf className="text-red-500" />
                 Apostila do Curso
               </h2>
+              <a 
+                href={course.pdf_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-army-green/20 text-army-green-light hover:bg-army-green/40 hover:text-white rounded-lg transition-colors text-xs md:text-sm font-bold border border-army-green/30"
+              >
+                <MdOpenInNew className="text-lg" />
+                <span className="hidden md:inline">Abrir em nova aba</span>
+              </a>
             </div>
-            <iframe src={course.pdf_url} className="w-full flex-1 border-0 bg-white" title="Visualizador PDF"></iframe>
+            <iframe 
+              src={course.pdf_url?.includes('drive.google.com') ? course.pdf_url.replace(/\/view.*$/, '/preview') : (course.pdf_url?.includes('docs.google.com') ? course.pdf_url : `https://docs.google.com/viewer?url=${encodeURIComponent(course.pdf_url)}&embedded=true`)} 
+              className="w-full flex-1 border-0 bg-white" 
+              title="Visualizador PDF"
+            ></iframe>
           </div>
         ) : activeModuleId === 'slides' ? (
           <div className="flex-1 bg-mil-dark border border-mil-border rounded-2xl overflow-hidden flex flex-col min-h-[70vh]">
@@ -308,8 +322,21 @@ export default function CourseDetails() {
                 <MdSlideshow className="text-orange-500" />
                 Apresentação de Slides
               </h2>
+              <a 
+                href={course.slides_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-army-green/20 text-army-green-light hover:bg-army-green/40 hover:text-white rounded-lg transition-colors text-xs md:text-sm font-bold border border-army-green/30"
+              >
+                <MdOpenInNew className="text-lg" />
+                <span className="hidden md:inline">Abrir em nova aba</span>
+              </a>
             </div>
-            <iframe src={course.slides_url} className="w-full flex-1 border-0 bg-white" title="Visualizador Slides"></iframe>
+            <iframe 
+              src={course.slides_url?.includes('drive.google.com') ? course.slides_url.replace(/\/view.*$/, '/preview') : (course.slides_url?.includes('docs.google.com') ? course.slides_url : `https://docs.google.com/viewer?url=${encodeURIComponent(course.slides_url)}&embedded=true`)} 
+              className="w-full flex-1 border-0 bg-white" 
+              title="Visualizador Slides"
+            ></iframe>
           </div>
         ) : activeModule ? (
           <div className="flex-1 bg-mil-dark border border-mil-border rounded-2xl overflow-hidden flex flex-col">

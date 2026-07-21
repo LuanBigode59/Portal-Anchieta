@@ -42,6 +42,7 @@ import ManagePromotions from './pages/admin/ManagePromotions';
 import ManageWarnings from './pages/admin/ManageWarnings';
 import ManageCourses from './pages/admin/ManageCourses';
 import ManageExams from './pages/admin/ManageExams';
+import ExamResults from './pages/admin/ExamResults';
 import ManageOperations from './pages/admin/ManageOperations';
 import MilitarProfile from './pages/admin/MilitarProfile';
 import AddMilitar from './pages/admin/AddMilitar';
@@ -129,6 +130,7 @@ export default function App() {
             <Route path="advertencias" element={<ManageWarnings />} />
             <Route path="cursos" element={<ManageCourses />} />
             <Route path="provas" element={<ManageExams />} />
+            <Route path="resultados-provas" element={<ExamResults />} />
             <Route path="operacoes" element={<ManageOperations />} />
             <Route path="assinaturas" element={<ManageSignatures />} />
             <Route path="exonerados" element={<ManageExonerated />} />

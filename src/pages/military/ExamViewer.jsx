@@ -5,6 +5,7 @@ import { examService } from '../../services/examService';
 import { userService } from '../../services/userService';
 import { useAuth } from '../../contexts/AuthContext';
 import { signatureService } from '../../services/signatureService';
+import { supabase } from '../../supabaseClient';
 import { cargoLabels } from '../../data/ranks';
 import CertificateTemplate from '../../components/certificates/CertificateTemplate';
 import { downloadCertificateAsPDF } from '../../utils/certificateGenerator';
@@ -62,6 +63,42 @@ export default function ExamViewer() {
     }
     loadExam();
   }, [id, user, navigate, sendNotification]);
+
+  // Broadcast exam start to admins
+  useEffect(() => {
+    if (!loading && exam && !result && user && timeLeft > 0) {
+      // Create a unique channel for broadcasting or use a general one
+      const channel = supabase.channel('exam-alerts');
+      
+      channel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          channel.send({
+            type: 'broadcast',
+            event: 'exam_started',
+            payload: {
+              militarNome: user.nome,
+              militarPatente: user.patente,
+              provaTitulo: exam.titulo,
+              timestamp: Date.now()
+            }
+          });
+          // Unsubscribe after sending to avoid memory leaks
+          setTimeout(() => supabase.removeChannel(channel), 2000);
+        }
+      });
+
+      // Enviar notificação no Discord (Webhook Privado)
+      const webhookUrl = "https://discord.com/api/webhooks/1528989572518641716/LvONcKop1YTwG51KPbOHf-Qf6_MYxaspP5tuuMeGrkVjCblpB6ajMGAyyADLWOPd9KQn";
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: `🚨 **ALERTA DE PROVA**\nO ${user.patente} **${user.nome}** acabou de INICIAR a prova **${exam.titulo}**! ⏰`
+        })
+      }).catch(err => console.error("Erro ao enviar webhook do discord", err));
+
+    }
+  }, [loading, exam, result, user]); // Only run when these states change and exam is ready
 
   // Timer Effect
   useEffect(() => {

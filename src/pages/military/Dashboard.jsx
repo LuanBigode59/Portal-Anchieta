@@ -79,6 +79,7 @@ export default function Dashboard() {
   const [historyDocs, setHistoryDocs] = useState([]);
   const [selectedDocs, setSelectedDocs] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
+  const [coursesList, setCoursesList] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -86,6 +87,7 @@ export default function Dashboard() {
         // getUsers() already excludes exonerated users, so totalEfetivo = active only
         const users = await userService.getUsers();
         const courses = await courseService.getCourses();
+        setCoursesList(courses);
         const ops = await operationService.getOperations();
         const pDocs = await signatureService.getPendingDocuments();
         const signedDocs = await signatureService.getSignedDocuments();
@@ -567,12 +569,11 @@ export default function Dashboard() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Curso / Treinamento</label>
-              <select name="curso" className="mil-select">
-                <option>Curso de CDC</option>
-                <option>Tiro Policial</option>
-                <option>Operações Especiais</option>
-                <option>Primeiros Socorros</option>
-                <option>Direção Defensiva</option>
+              <select name="curso" className="mil-select" required>
+                <option value="">Selecione o curso</option>
+                {coursesList.map(c => (
+                  <option key={c.id} value={c.nome}>{c.nome}</option>
+                ))}
               </select>
             </div>
             <div>

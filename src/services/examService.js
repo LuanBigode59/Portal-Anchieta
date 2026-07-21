@@ -57,7 +57,15 @@ export const examService = {
     if (error) throw error;
   },
 
-  // --- RESULTADOS & CERTIFICADOS ---
+  async getAllDetailedResults() {
+    const { data, error } = await supabase
+      .from('resultados_provas')
+      .select('*, profiles(nome, patente, cargo), provas(titulo, perguntas)')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
   async submitExam(militarId, provaId, cursoId, respostasUsuario, score, isApproved, attemptCount) {
     // 1. Salvar o resultado
     const { data: resultado, error: resError } = await supabase

@@ -9,11 +9,13 @@ import {
   MdChat, MdBarChart, MdNotifications, MdPerson, MdGavel, MdAccessTime
 } from 'react-icons/md';
 import { GiMilitaryFort, GiMedal } from 'react-icons/gi';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NotificationsPanel from './NotificationsPanel';
+import { supabase } from '../../supabaseClient';
+
 export default function Sidebar() {
   const { user, logout, isAdmin, isInstrutor, isOfficer, userRankLevel } = useAuth();
-  const { unreadCount } = useNotifications();
+  const { unreadCount, sendNotification } = useNotifications();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -22,6 +24,20 @@ export default function Sidebar() {
     logout();
     navigate('/login');
   };
+
+  useEffect(() => {
+    if (user && ['capitao', 'major', 'tenente_coronel'].includes(user.patente?.toLowerCase()?.replace('-', '_'))) {
+      const channel = supabase.channel('exam-alerts-listener');
+      channel.on('broadcast', { event: 'exam_started' }, (payload) => {
+        const { militarNome, militarPatente, provaTitulo } = payload.payload;
+        sendNotification(`⚠️ ALERTA: ${militarPatente} ${militarNome} iniciou a prova ${provaTitulo}.`, 'info');
+      }).subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user, sendNotification]);
 
   const militaryLinks = [
     { to: '/militar/dashboard', icon: <MdDashboard />, label: 'Dashboard' },
@@ -49,6 +65,7 @@ export default function Sidebar() {
     { to: '/admin/advertencias', icon: <MdGavel />, label: 'Advertências' },
     { to: '/admin/cursos', icon: <MdSettings />, label: 'Gerenciar Cursos' },
     { to: '/admin/provas', icon: <MdAssignment />, label: 'Gerenciar Provas' },
+    { to: '/admin/resultados-provas', icon: <MdAssignment />, label: 'Resultado de Provas' },
     { to: '/admin/operacoes', icon: <MdAssessment />, label: 'Gerenciar Operações' },
     ...(user && ['capitao', 'major', 'tenente_coronel'].includes(user.patente?.toLowerCase())
       ? [{ to: '/admin/medalhas', icon: <GiMedal />, label: 'Gerenciar Medalhas' }]
