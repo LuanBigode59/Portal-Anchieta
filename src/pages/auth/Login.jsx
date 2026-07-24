@@ -9,6 +9,7 @@ export default function Login() {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [nome, setNome] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ export default function Login() {
       if (isLogin) {
         await login(cpf, senha);
       } else {
-        await register(cpf, senha, nome || 'Efetivo', 'soldado');
+        await register(cpf, senha, nome || 'Efetivo', whatsapp);
       }
       navigate('/militar/dashboard');
     } catch (err) {
@@ -145,6 +146,22 @@ export default function Login() {
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     placeholder="Ex: Sd. Silva"
+                    className="mil-input"
+                    required={!isLogin}
+                  />
+                </div>
+              )}
+
+              {!isLogin && (
+                <div className="animate-fadeIn">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                    WhatsApp (Obrigatório) *
+                  </label>
+                  <input
+                    type="tel"
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    placeholder="Ex: (11) 99999-9999"
                     className="mil-input"
                     required={!isLogin}
                   />

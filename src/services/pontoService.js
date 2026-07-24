@@ -51,6 +51,22 @@ export const pontoService = {
     return count || 0;
   },
 
+  // Retorna lista de militares com ponto aberto (em serviço) com dados do perfil
+  async obterMilitaresEmServico() {
+    const { data, error } = await supabase
+      .from('ponto_eletronico')
+      .select('*, profiles:user_id(id, nome, patente, cargo, foto_url, companhia)')
+      .eq('status', 'Aberto')
+      .order('entrada', { ascending: false });
+
+    if (error) {
+      console.error('Erro ao obter militares em serviço:', error);
+      throw error;
+    }
+
+    return data || [];
+  },
+
   // Inicia um novo turno de ponto
   async baterPontoEntrada(userId) {
     // Verifica se já existe um ponto aberto

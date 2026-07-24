@@ -63,7 +63,7 @@ export const ADMIN_ROLES = ['tenente_coronel', 'major'];
 export const INSTRUCTOR_ROLES = ['tenente_coronel', 'major', 'capitao', 'instrutor'];
 export const COMMAND_ROLES = ['tenente_coronel', 'major', 'capitao', 'primeiro_tenente'];
 
-export const DISCORD_LINK = 'https://discord.gg/2bpchoque';
+export const WHATSAPP_LINK = 'https://wa.me/group-link';
 
 export const NOTIFICATION_TYPES = {
   CURSO: { id: 'curso', label: 'Curso Pendente', icon: '📚' },

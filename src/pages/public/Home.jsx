@@ -4,7 +4,7 @@ import {
   MdSecurity, MdSchool, MdPeople, MdArrowForward,
   MdMilitaryTech, MdGavel, MdStarRate,
 } from 'react-icons/md';
-import { FaDiscord } from 'react-icons/fa';
+import { FaWhatsapp } from 'react-icons/fa';
 
 export default function Home() {
   const actionButtons = [

@@ -7,9 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { signatureService } from '../../services/signatureService';
 import { supabase } from '../../supabaseClient';
 import { cargoLabels } from '../../data/ranks';
-import CertificateTemplate from '../../components/certificates/CertificateTemplate';
-import { downloadCertificateAsPDF } from '../../utils/certificateGenerator';
-import { MdTimer, MdCheckCircle, MdCancel, MdSend, MdArrowBack, MdDownload, MdCardMembership } from 'react-icons/md';
+import { MdTimer, MdCheckCircle, MdCancel, MdSend, MdArrowBack } from 'react-icons/md';
 import { useNotifications } from '../../contexts/NotificationContext';
 
 export default function ExamViewer() {
@@ -25,10 +23,7 @@ export default function ExamViewer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [certificate, setCertificate] = useState(null);
-  const [downloading, setDownloading] = useState(false);
-  const [showCertPreview, setShowCertPreview] = useState(false);
   const timerRef = useRef(null);
-  const certRef = useRef(null);
 
 
   useEffect(() => {
@@ -205,7 +200,18 @@ export default function ExamViewer() {
             nota: score
           }
         });
-        sendNotification(`Parabéns! Você foi aprovado com nota ${score}. Seu certificado foi enviado para assinatura do Comando Geral.`, 'sucesso');
+
+        // Enviar webhook no Discord para os admins
+        const webhookUrl = "https://discord.com/api/webhooks/1528989572518641716/LvONcKop1YTwG51KPbOHf-Qf6_MYxaspP5tuuMeGrkVjCblpB6ajMGAyyADLWOPd9KQn";
+        fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: `🎓 **CURSO CONCLUÍDO**\nO ${user.patente} **${user.nome}** acabou de CONCLUIR o curso **${exam.cursos?.nome || exam.titulo}**! Falta você entregar o certificado dele.`
+          })
+        }).catch(err => console.error("Erro ao enviar webhook do discord", err));
+
+        sendNotification(`Parabéns! Você foi aprovado com nota ${score}. Seu certificado será enviado no grupo do WhatsApp oficial do 2º BPChq Anchieta.`, 'sucesso');
       } else {
         sendNotification(`Você reprovou com nota ${score}. Mínimo necessário: ${exam.nota_aprovacao}.`, 'erro');
       }
@@ -269,35 +275,12 @@ export default function ExamViewer() {
           </p>
 
           {result.aprovado && certificate && (
-            <div className="mt-4 space-y-3">
-              <div className="inline-block bg-mil-black border border-gold/30 p-4 rounded-xl text-left">
-                <p className="text-[10px] font-bold text-gold uppercase tracking-widest mb-1">🏅 Certificado Emitido</p>
-                <p className="text-sm font-mono text-gray-300">Cód: {certificate.codigo_verificacao}</p>
-                <p className="text-xs text-gray-500 mt-1">Válido no Portal de Verificação do 2º BP CHOQUE</p>
-              </div>
-              <div className="flex gap-2 justify-center flex-wrap">
-                <button
-                  onClick={() => setShowCertPreview(true)}
-                  className="btn-secondary !text-xs flex items-center gap-1.5"
-                >
-                  <MdCardMembership /> Visualizar Certificado
-                </button>
-                <button
-                  onClick={async () => {
-                    if (!certRef.current) { setShowCertPreview(true); return; }
-                    setDownloading(true);
-                    try {
-                      await downloadCertificateAsPDF(certRef.current, `Certificado_${exam?.cursos?.nome || 'curso'}`);
-                      sendNotification('PDF baixado!', 'sucesso');
-                    } catch(e) { sendNotification('Erro ao gerar PDF', 'erro'); }
-                    finally { setDownloading(false); }
-                  }}
-                  disabled={downloading}
-                  className="btn-gold !text-xs flex items-center gap-1.5"
-                >
-                  {downloading ? <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : <MdDownload />}
-                  Baixar PDF
-                </button>
+            <div className="mt-4 space-y-3 flex justify-center">
+              <div className="inline-block bg-mil-black border border-gold/30 p-4 rounded-xl text-center w-full max-w-md">
+                <p className="text-[10px] font-bold text-gold uppercase tracking-widest mb-2">🏅 Curso Concluído</p>
+                <p className="text-sm text-gray-300">
+                  O seu certificado será enviado no grupo do WhatsApp oficial do <strong>2º BPChq Anchieta</strong> em breve.
+                </p>
               </div>
             </div>
           )}
@@ -374,52 +357,6 @@ export default function ExamViewer() {
         )}
       </form>
 
-      {/* ===== CERTIFICATE PREVIEW MODAL ===== */}
-      {showCertPreview && certificate && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="flex items-center justify-between w-full max-w-5xl mb-4 bg-mil-dark border border-gray-800 rounded-xl px-5 py-3">
-            <div>
-              <h2 className="text-sm font-black text-white uppercase tracking-widest">Certificado de Conclusão</h2>
-              <p className="text-[10px] text-gray-500 font-mono">{certificate.codigo_verificacao}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={async () => {
-                  setDownloading(true);
-                  try {
-                    await downloadCertificateAsPDF(certRef.current, `Certificado_${exam?.cursos?.nome || 'curso'}`);
-                    sendNotification('PDF baixado!', 'sucesso');
-                  } catch(e) { sendNotification('Erro ao gerar PDF', 'erro'); }
-                  finally { setDownloading(false); }
-                }}
-                disabled={downloading}
-                className="btn-gold !py-2 !px-4 !text-xs flex items-center gap-1.5"
-              >
-                {downloading ? <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : <MdDownload />}
-                Baixar PDF
-              </button>
-              <button onClick={() => setShowCertPreview(false)} className="text-gray-400 hover:text-white p-2 transition-colors">
-                <MdCancel className="text-2xl" />
-              </button>
-            </div>
-          </div>
-          <div className="overflow-auto w-full flex justify-center">
-            <div style={{ transform: 'scale(0.75)', transformOrigin: 'top center', marginBottom: '-184px' }}>
-              <CertificateTemplate
-                ref={certRef}
-                militarNome={user?.nome}
-                militarPatente={cargoLabels?.[user?.cargo] || user?.cargo}
-                cursoNome={exam?.cursos?.nome}
-                cargaHoraria={exam?.cursos?.carga_horaria || '—'}
-                nota={result?.nota}
-                instrutor={exam?.cursos?.instrutor || 'Instrutor Responsável'}
-                data={certificate.data_emissao ? new Date(certificate.data_emissao).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')}
-                codigo={certificate.codigo_verificacao}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

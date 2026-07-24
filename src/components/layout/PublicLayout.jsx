@@ -49,7 +49,7 @@ export default function PublicLayout() {
             <div>
               <h4 className="text-gray-300 font-bold text-xs uppercase tracking-widest mb-4">Contato</h4>
               <ul className="space-y-2 text-sm text-gray-500">
-                <li>Discord: 2º BP Choque Anchieta</li>
+                <li>WhatsApp: 2º BP Choque Anchieta</li>
                 <li>Comando: {commander}</li>
                 <li>Cidade: Anchieta</li>
               </ul>

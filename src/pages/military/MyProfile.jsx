@@ -53,7 +53,7 @@ export default function MyProfile() {
             {[
               { label: 'Companhia', value: user?.companhia || 'Não Designado' },
               { label: 'Ingresso', value: user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : '—' },
-              { label: 'Discord', value: user?.discord || '—' },
+              { label: 'WhatsApp', value: user?.discord || '—' },
               { label: 'Banco de Horas', value: formatTime(user?.banco_horas) || user?.horas_servico || '0h' },
             ].map((item, i) => (
               <div key={i} className="px-4 py-2 rounded-lg bg-mil-black/40 border border-mil-border">
@@ -91,7 +91,7 @@ export default function MyProfile() {
               {[
                 { label: 'Nome RP', value: user?.nome },
                 { label: 'Passaporte/ID', value: user?.cpf },
-                { label: 'Discord', value: user?.discord || '—' },
+                { label: 'WhatsApp', value: user?.discord || '—' },
                 { label: 'Patente Atual', value: rankData ? `${rankData.insignia} ${rankData.name}` : user?.patente },
                 { label: 'Companhia', value: user?.companhia || 'Não Designado' },
                 { label: 'Data de Ingresso', value: user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : '—' },

@@ -91,7 +91,7 @@ export function AuthProvider({ children }) {
     await fetchProfile(data.user.id, true);
   };
 
-  const register = async (cpf, senha, nome) => {
+  const register = async (cpf, senha, nome, whatsapp) => {
     const email = `${cpf}@provaschoque.com.br`;
     
     // Check if user exists
@@ -130,7 +130,7 @@ export function AuthProvider({ children }) {
             cargo: 'soldado_segunda',
             patente: 'soldado_segunda',
             companhia: 'Aguardando Designação',
-            discord: '',
+            discord: whatsapp || '',
             horas_servico: '0h',
             status: 'Ativo',
             ativo: true,

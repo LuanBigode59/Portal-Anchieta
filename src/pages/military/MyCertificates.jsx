@@ -1,8 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Topbar from '../../components/layout/Topbar';
-import CertificateTemplate from '../../components/certificates/CertificateTemplate';
-import { downloadCertificateAsPDF } from '../../utils/certificateGenerator';
 import { examService } from '../../services/examService';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { cargoLabels } from '../../data/ranks';
@@ -17,8 +15,6 @@ export default function MyCertificates() {
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCert, setSelectedCert] = useState(null);
-  const [downloading, setDownloading] = useState(false);
-  const certRef = useRef(null);
 
   useEffect(() => {
     async function load() {
@@ -36,33 +32,6 @@ export default function MyCertificates() {
     load();
   }, [user]);
 
-  const handleDownload = async () => {
-    if (!certRef.current || !selectedCert) return;
-    setDownloading(true);
-    try {
-      const nomeSanitized = (selectedCert.cursos?.nome || 'curso').replace(/[^a-zA-Z0-9]/g, '_');
-      await downloadCertificateAsPDF(certRef.current, `Certificado_${nomeSanitized}`);
-      sendNotification('PDF baixado com sucesso!', 'sucesso');
-    } catch (err) {
-      console.error(err);
-      sendNotification('Erro ao gerar PDF: ' + err.message, 'erro');
-    } finally {
-      setDownloading(false);
-    }
-  };
-
-  const certData = selectedCert ? {
-    militarNome: user?.nome || '',
-    militarPatente: cargoLabels[user?.cargo] || user?.cargo || '',
-    cursoNome: selectedCert.cursos?.nome || 'Curso',
-    cargaHoraria: selectedCert.cursos?.carga_horaria || '',
-    nota: selectedCert.nota,
-    instrutor: selectedCert.cursos?.instrutor || 'Instrutor',
-    data: selectedCert.data_emissao
-      ? new Date(selectedCert.data_emissao).toLocaleDateString('pt-BR')
-      : new Date().toLocaleDateString('pt-BR'),
-    codigo: selectedCert.codigo_verificacao,
-  } : null;
 
   return (
     <div className="animate-fadeIn pb-10">
@@ -142,44 +111,24 @@ export default function MyCertificates() {
         </div>
       )}
 
-      {/* ===== CERTIFICATE PREVIEW MODAL ===== */}
-      {selectedCert && certData && (
+      {/* ===== CERTIFICATE MODAL ===== */}
+      {selectedCert && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fadeIn p-4">
-          <div className="flex flex-col items-center gap-4 w-full max-w-5xl">
-            {/* Toolbar */}
-            <div className="flex items-center justify-between w-full bg-mil-dark border border-gray-800 rounded-xl px-5 py-3">
-              <div>
-                <h2 className="text-sm font-black text-white uppercase tracking-widest">
+          <div className="flex flex-col items-center gap-4 w-full max-w-md bg-mil-dark border border-gray-800 rounded-xl p-6 relative">
+             <button
+                onClick={() => setSelectedCert(null)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors p-2"
+              >
+                <MdClose className="text-xl" />
+              </button>
+              
+              <MdCardMembership className="text-6xl text-gold mb-2" />
+              <h2 className="text-xl font-black text-white uppercase tracking-widest text-center">
                   {selectedCert.cursos?.nome}
-                </h2>
-                <p className="text-[10px] text-gray-500 font-mono mt-0.5">{selectedCert.codigo_verificacao}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleDownload}
-                  disabled={downloading}
-                  className="btn-gold !py-2 !px-4 !text-[11px] flex items-center gap-1.5"
-                >
-                  {downloading
-                    ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                    : <MdDownload className="text-base" />}
-                  {downloading ? 'Gerando...' : 'Baixar PDF'}
-                </button>
-                <button
-                  onClick={() => setSelectedCert(null)}
-                  className="text-gray-500 hover:text-white transition-colors p-2"
-                >
-                  <MdClose className="text-2xl" />
-                </button>
-              </div>
-            </div>
-
-            {/* Certificate Preview — scrollable on small screens */}
-            <div className="overflow-auto w-full rounded-xl shadow-2xl shadow-gold/10 flex justify-center">
-              <div style={{ transform: 'scale(0.75)', transformOrigin: 'top center', marginBottom: '-184px' }}>
-                <CertificateTemplate ref={certRef} {...certData} />
-              </div>
-            </div>
+              </h2>
+              <p className="text-center text-sm text-gray-400 mt-2">
+                 O seu certificado foi enviado no grupo do WhatsApp oficial do <strong>2º BPChq Anchieta</strong>.
+              </p>
           </div>
         </div>
       )}

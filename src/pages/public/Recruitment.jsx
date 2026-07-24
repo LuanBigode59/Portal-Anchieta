@@ -4,7 +4,7 @@ import { GiMilitaryFort } from 'react-icons/gi';
 
 export default function Recruitment() {
   const [formData, setFormData] = useState({
-    nomeRp: '', id: '', discord: '', steam: '',
+    nomeRp: '', id: '', whatsapp: '', steam: '',
     experiencia: '', cidadeAnterior: '', disponibilidade: '',
   });
   const [submitted, setSubmitted] = useState(false);
@@ -33,7 +33,7 @@ export default function Recruitment() {
           <h2 className="text-2xl font-black text-white mb-3">Formulário Enviado!</h2>
           <p className="text-gray-400 mb-6">
             Sua solicitação de recrutamento foi recebida com sucesso. 
-            Aguarde contato do comando pelo Discord.
+            Aguarde contato do comando pelo WhatsApp.
           </p>
           <span className="badge-green !text-xs !px-4 !py-2">Protocolo: #REC-{Date.now().toString(36).toUpperCase()}</span>
         </div>
@@ -93,14 +93,14 @@ export default function Recruitment() {
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
-                  Discord *
+                  WhatsApp *
                 </label>
                 <input
-                  type="text"
-                  name="discord"
-                  value={formData.discord}
+                  type="tel"
+                  name="whatsapp"
+                  value={formData.whatsapp}
                   onChange={handleChange}
-                  placeholder="usuario#0000"
+                  placeholder="(11) 99999-9999"
                   className="mil-input"
                   required
                 />

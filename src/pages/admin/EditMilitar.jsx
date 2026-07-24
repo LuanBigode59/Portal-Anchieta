@@ -283,12 +283,13 @@ export default function EditMilitar() {
               </select>
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Discord ID</label>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">WhatsApp</label>
               <input 
-                type="text" 
+                type="tel" 
                 value={formData.discord}
                 onChange={e => setFormData({...formData, discord: e.target.value})}
-                className="mil-input" 
+                className="mil-input"
+                placeholder="Ex: (11) 99999-9999" 
               />
             </div>
           </div>

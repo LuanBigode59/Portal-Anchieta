@@ -38,8 +38,8 @@ export default function Config() {
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Discord ID (Opcional)</label>
-            <input type="text" className="mil-input" placeholder="Ex: usuario#1234" defaultValue="luanbigode#0000" />
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">WhatsApp</label>
+            <input type="tel" className="mil-input" placeholder="Ex: (11) 99999-9999" defaultValue="" />
           </div>
 
           <div className="flex justify-end pt-4 border-t border-gray-800">

@@ -42,6 +42,7 @@ export default function Sidebar() {
   const militaryLinks = [
     { to: '/militar/dashboard', icon: <MdDashboard />, label: 'Dashboard' },
     { to: '/militar/ponto', icon: <MdAccessTime />, label: 'Bater Ponto' },
+    { to: '/militar/em-servico', icon: <MdPeople />, label: 'Em Serviço' },
     { to: '/militar/ficha', icon: <MdPerson />, label: 'Minha Ficha' },
     { to: '/militar/cursos', icon: <MdSchool />, label: 'Cursos' },
     { to: '/militar/provas', icon: <MdQuiz />, label: 'Provas' },

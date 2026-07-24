@@ -149,8 +149,8 @@ export default function MilitarProfile() {
                   <span className="text-sm text-gray-200 font-mono">{militar.dataIngresso}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-800/50 pb-2">
-                  <span className="text-xs text-gray-500 font-bold uppercase">Discord ID</span>
-                  <span className="text-sm text-gray-200 font-mono bg-indigo-900/30 px-2 py-0.5 rounded border border-indigo-500/30 text-indigo-300 flex items-center gap-2">
+                  <span className="text-xs text-gray-500 font-bold uppercase">WhatsApp</span>
+                  <span className="text-sm text-gray-200 font-mono bg-green-900/30 px-2 py-0.5 rounded border border-green-500/30 text-green-300 flex items-center gap-2">
                     <MdChat /> {militar.discord || 'Não informado'}
                   </span>
                 </div>

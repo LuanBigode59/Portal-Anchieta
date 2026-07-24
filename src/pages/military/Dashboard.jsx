@@ -645,8 +645,8 @@ export default function Dashboard() {
             </select>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Discord ID (Opcional)</label>
-            <input type="text" className="mil-input" placeholder="usuario#0000" />
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">WhatsApp</label>
+            <input type="text" className="mil-input" placeholder="(11) 99999-9999" />
           </div>
         </div>
       </ActionModal>

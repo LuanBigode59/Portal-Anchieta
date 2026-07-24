@@ -239,9 +239,9 @@ export default function Chat() {
 
   return (
     <div className="h-[calc(100vh-120px)] flex flex-col animate-fadeIn pb-4">
-      <Topbar title="CENTRAL DE COMUNICAÇÕES" subtitle="Chat militar unificado estilo Discord" />
+      <Topbar title="CENTRAL DE COMUNICAÇÕES" subtitle="Chat militar unificado" />
 
-      {/* Main Grid Layout Discord-like */}
+      {/* Main Grid Layout */}
       <div className="flex-1 bg-mil-black rounded-2xl border border-gray-800 flex overflow-hidden shadow-2xl">
         
         {/* 1. Sidebar de Canais */}
