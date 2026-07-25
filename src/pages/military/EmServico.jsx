@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { pontoService } from '../../services/pontoService';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { cargoLabels, cargoBadgeClass } from '../../data/ranks';
 import {
   MdAccessTime, MdSearch, MdFilterList, MdPeople, MdRefresh,
   MdSignalWifiStatusbar4Bar, MdPerson, MdLocationOn
 } from 'react-icons/md';
-import { FiShield, FiClock, FiUsers, FiActivity } from 'react-icons/fi';
+import { FiShield, FiClock, FiUsers, FiActivity, FiPower } from 'react-icons/fi';
 import { GiPoliceBadge } from 'react-icons/gi';
 
 // Formata segundos em HH:MM:SS
@@ -33,11 +34,28 @@ function tempoDesde(dataISO) {
 
 export default function EmServico() {
   const { addNotification } = useNotifications();
+  const { user } = useAuth();
   const [militares, setMilitares] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterCompanhia, setFilterCompanhia] = useState('Todas');
   const [tick, setTick] = useState(0); // Para atualizar cronômetros
+
+  const canClosePoint = user && ['tenente_coronel', 'major', 'capitao'].includes(user.cargo);
+
+  const handleClosePoint = async (registro) => {
+    if (!window.confirm(`Tem certeza que deseja encerrar o ponto de ${registro.profiles.nome}?`)) return;
+    try {
+      setLoading(true);
+      await pontoService.baterPontoSaida(registro.id, registro.user_id);
+      addNotification('sucesso', `Ponto de ${registro.profiles.nome} encerrado com sucesso.`);
+      loadData();
+    } catch (error) {
+      console.error(error);
+      addNotification('erro', 'Erro ao encerrar ponto.');
+      setLoading(false);
+    }
+  };
 
   // Carrega dados
   const loadData = async () => {
@@ -347,10 +365,21 @@ export default function EmServico() {
 
                         {/* Status */}
                         <td className="py-5 pr-8 text-right">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] uppercase tracking-widest rounded-full font-bold border bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                            Em Serviço
-                          </span>
+                          <div className="flex items-center justify-end gap-3">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] uppercase tracking-widest rounded-full font-bold border bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                              Em Serviço
+                            </span>
+                            {canClosePoint && (
+                              <button
+                                onClick={() => handleClosePoint(registro)}
+                                title="Forçar Encerramento de Ponto"
+                                className="w-8 h-8 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
+                              >
+                                <FiPower size={14} />
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -420,6 +449,15 @@ export default function EmServico() {
                             <span className="text-green-400 font-mono font-bold text-xs tracking-wider">
                               {formatDuration(segundosAtivos)}
                             </span>
+                            {canClosePoint && (
+                              <button
+                                onClick={() => handleClosePoint(registro)}
+                                title="Forçar Encerramento"
+                                className="ml-1 w-7 h-7 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
+                              >
+                                <FiPower size={12} />
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
