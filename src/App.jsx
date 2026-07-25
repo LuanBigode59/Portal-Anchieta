@@ -35,6 +35,7 @@ import MyCertificates from './pages/military/MyCertificates';
 import Copom from './pages/military/Copom';
 import PontoEletronico from './pages/military/PontoEletronico';
 import EmServico from './pages/military/EmServico';
+import Fardamentos from './pages/military/Fardamentos';
 
 // Admin Pages
 import AdminPanel from './pages/admin/AdminPanel';
@@ -115,6 +116,7 @@ export default function App() {
             <Route path="certificados" element={<MyCertificates />} />
             <Route path="ponto" element={<PontoEletronico />} />
             <Route path="em-servico" element={<EmServico />} />
+            <Route path="fardamentos" element={<Fardamentos />} />
           </Route>
 
           {/* Protected Command Area */}

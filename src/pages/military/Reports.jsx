@@ -72,7 +72,7 @@ export default function Reports() {
           autor_nome: user.nome
         }
       });
-      
+
       // Assinatura automática para RSO ficar disponível imediatamente
       await signatureService.signDocument(newDoc.id, {
         nome: "Comando do 2º BP Choque",
@@ -106,11 +106,11 @@ export default function Reports() {
     try {
       const doc = new jsPDF();
       const d = report.dados;
-      
+
       // Papel de Fundo Militar
       doc.setFillColor(20, 20, 20);
       doc.rect(0, 0, 210, 297, 'F');
-      
+
       // Borda Gold
       doc.setDrawColor(201, 168, 76);
       doc.setLineWidth(0.5);
@@ -123,7 +123,7 @@ export default function Reports() {
       doc.text("RELATÓRIO DE SERVIÇO OPERACIONAL — RSO", 105, 25, { align: "center" });
       doc.setFontSize(11);
       doc.text("2º BATALHÃO DE POLÍCIA DE CHOQUE ANCHIETA — ELITE SP", 105, 32, { align: "center" });
-      
+
       doc.setDrawColor(40, 40, 40);
       doc.line(15, 38, 195, 38);
 
@@ -155,7 +155,7 @@ export default function Reports() {
 
       addSection("I — DADOS DA VIATURA", [
         `Prefixo: ${d.prefixo || 'N/A'}`,
-        `Guarnição/Steaves em serviço:`,
+        `Guarnição/Steves em serviço:`,
         d.guarnicao || 'N/A'
       ]);
 
@@ -209,7 +209,7 @@ export default function Reports() {
       doc.setTextColor(201, 168, 76);
       doc.text("✯✯✯✯ | Tenente-Coronel PM", 105, y, { align: "center" });
       doc.text("Comandante do 2º BP Choque Anchieta", 105, y + 5, { align: "center" });
-      
+
       // Linha de assinatura
       doc.setDrawColor(100, 100, 100);
       doc.line(60, y + 25, 150, y + 25);
@@ -280,7 +280,7 @@ Data/Hora: ${new Date(report.assinatura_data).toLocaleString('pt-BR')}
 Hash: ${report.hash_seguranca}
 ==============================================
       `.trim();
-      
+
       await navigator.clipboard.writeText(text);
       sendNotification("Texto do RSO copiado para a área de transferência!", "sucesso");
     } catch (err) {
@@ -308,7 +308,7 @@ Hash: ${report.hash_seguranca}
     <div className="animate-fadeIn pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <Topbar title="RELATÓRIOS OPERACIONAIS (RSO)" subtitle="Gestão de Ocorrências e Atividades Homologadas" />
-        <button 
+        <button
           onClick={() => setShowCreateModal(true)}
           className="btn-green self-start sm:self-auto flex items-center gap-2"
         >
@@ -321,8 +321,8 @@ Hash: ${report.hash_seguranca}
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {reports.map(r => (
-            <div 
-              key={r.id} 
+            <div
+              key={r.id}
               onClick={() => setSelectedReport(r)}
               className="hero-card p-5 border border-gray-800 hover:border-gold/30 cursor-pointer flex flex-col group"
             >
@@ -341,7 +341,7 @@ Hash: ${report.hash_seguranca}
                   <span className="text-gold font-bold">{r.dados.bopm || 0}</span>
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-800 text-[10px] text-gray-500 font-mono">
                 <span>Relator: {r.dados.autor_nome?.split(' ')[0]}</span>
                 <span className="text-army-green-light">Assinado por: {r.assinatura_nome?.split(' ')[0]}</span>
@@ -369,7 +369,7 @@ Hash: ${report.hash_seguranca}
                 <MdClose className="text-2xl" />
               </button>
             </div>
-            
+
             <form onSubmit={handleCreate} className="p-5 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-1">
@@ -385,8 +385,8 @@ Hash: ${report.hash_seguranca}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Guarnição / Steaves *</label>
-                  <select 
-                    className="mil-input mb-2" 
+                  <select
+                    className="mil-input mb-2"
                     onChange={e => {
                       if (!e.target.value) return;
                       const u = users.find(x => x.id === e.target.value);
@@ -509,7 +509,7 @@ Hash: ${report.hash_seguranca}
                 <h4 className="text-gold font-bold uppercase text-[10px] mb-1">Guarnição</h4>
                 <div className="bg-mil-black/30 p-3 rounded-lg border border-gray-800 whitespace-pre-wrap">{selectedReport.dados.guarnicao}</div>
               </div>
-              
+
               <div>
                 <h4 className="text-gold font-bold uppercase text-[10px] mb-1">Estatísticas</h4>
                 <div className="bg-mil-black/30 p-3 rounded-lg border border-gray-800 grid grid-cols-5 gap-2 text-center">
@@ -527,7 +527,7 @@ Hash: ${report.hash_seguranca}
                   <p className="font-bold text-army-green-light flex items-center gap-1.5"><MdAssignmentTurnedIn /> {selectedReport.assinatura_nome} ({selectedReport.assinatura_patente})</p>
                   <p className="text-[10px] text-gray-500 font-mono mt-2">Cód. Validação: {selectedReport.codigo_autenticidade}</p>
                   <p className="text-[9px] text-gray-600 font-mono truncate mt-1">Hash: {selectedReport.hash_seguranca}</p>
-                  
+
                   {/* Assinatura Visual Cursiva */}
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-70 transform rotate-[-5deg]">
                     <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2rem', color: '#C9A84C' }}>

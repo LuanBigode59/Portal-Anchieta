@@ -6,7 +6,7 @@ import {
   MdDashboard, MdPeople, MdSchool, MdQuiz, MdAssignment, MdLeaderboard,
   MdAdminPanelSettings, MdLogout, MdMenu, MdClose, MdStar, MdAssessment,
   MdSettings, MdDescription, MdCalendarMonth, MdMilitaryTech, MdCampaign,
-  MdChat, MdBarChart, MdNotifications, MdPerson, MdGavel, MdAccessTime
+  MdChat, MdBarChart, MdNotifications, MdPerson, MdGavel, MdAccessTime, MdCheckroom
 } from 'react-icons/md';
 import { GiMilitaryFort, GiMedal } from 'react-icons/gi';
 import { useState, useEffect } from 'react';
@@ -45,7 +45,7 @@ export default function Sidebar() {
     { to: '/militar/em-servico', icon: <MdPeople />, label: 'Em Serviço' },
     { to: '/militar/ficha', icon: <MdPerson />, label: 'Minha Ficha' },
     { to: '/militar/cursos', icon: <MdSchool />, label: 'Cursos' },
-    { to: '/militar/provas', icon: <MdQuiz />, label: 'Provas' },
+    { to: '/militar/fardamentos', icon: <MdCheckroom />, label: 'Fardamentos' },
     { to: '/militar/escalas', icon: <MdCalendarMonth />, label: 'Escalas' },
     { to: '/militar/operacoes', icon: <MdMilitaryTech />, label: 'Operações' },
     { to: '/militar/relatorios', icon: <MdDescription />, label: 'Relatórios' },
