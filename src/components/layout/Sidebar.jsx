@@ -71,7 +71,7 @@ export default function Sidebar() {
     ...(user && ['capitao', 'major', 'tenente_coronel'].includes(user.patente?.toLowerCase())
       ? [{ to: '/admin/medalhas', icon: <GiMedal />, label: 'Gerenciar Medalhas' }]
       : []),
-  ];  const showAdmin = isAdmin || isInstrutor || isOfficer;  const sidebarContent = (
+  ];  const showAdmin = isAdmin || isInstrutor || isOfficer || user?.cpf === '41632';  const sidebarContent = (
     <div className="flex flex-col h-full bg-mil-black/90 backdrop-blur-md">
       {/* Header / Emblema */}
       <div className="scanline-overlay px-4 pt-8 pb-6 border-b border-gray-800 relative shadow-md">

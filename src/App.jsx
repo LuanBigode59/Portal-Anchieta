@@ -121,7 +121,7 @@ export default function App() {
 
           {/* Protected Command Area */}
           <Route path="/admin" element={
-            <ProtectedRoute roles={['tenente_coronel', 'major', 'capitao', 'primeiro_tenente']}>
+            <ProtectedRoute roles={['tenente_coronel', 'major', 'capitao', 'primeiro_tenente']} allowedUsers={['41632']}>
               <MainLayout />
             </ProtectedRoute>
           }>
