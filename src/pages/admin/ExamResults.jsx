@@ -3,7 +3,7 @@ import Topbar from '../../components/layout/Topbar';
 import { examService } from '../../services/examService';
 import { MdAssignment, MdCheckCircle, MdCancel, MdClose, MdVisibility, MdDelete } from 'react-icons/md';
 import { cargoBadgeClass, cargoLabels } from '../../data/ranks';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../supabaseClient';
 
 export default function ExamResults() {
   const [results, setResults] = useState([]);
