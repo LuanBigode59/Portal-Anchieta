@@ -204,10 +204,10 @@ export default function CourseDetails() {
                   onClick={() => unlocked && setActiveModuleId(mod.id)}
                   disabled={!unlocked}
                   className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${isActive
-                      ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
-                      : !unlocked
-                        ? 'border-mil-border/40 bg-mil-black/50 opacity-50 cursor-not-allowed'
-                        : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
+                    ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
+                    : !unlocked
+                      ? 'border-mil-border/40 bg-mil-black/50 opacity-50 cursor-not-allowed'
+                      : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
                     }`}
                 >
                   <div className="flex items-center gap-2 mb-1.5">
@@ -252,8 +252,8 @@ export default function CourseDetails() {
                   <button
                     onClick={() => setActiveModuleId('pdf')}
                     className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${activeModuleId === 'pdf'
-                        ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
-                        : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
+                      ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
+                      : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
                       }`}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
@@ -271,8 +271,8 @@ export default function CourseDetails() {
                   <button
                     onClick={() => setActiveModuleId('slides')}
                     className={`text-left flex flex-col p-4 rounded-xl border transition-all duration-300 ${activeModuleId === 'slides'
-                        ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
-                        : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
+                      ? 'border-army-green/60 bg-army-green-dark/30 shadow-[0_0_20px_rgba(45,90,30,0.15)]'
+                      : 'border-mil-border bg-mil-dark hover:border-mil-border-light cursor-pointer'
                       }`}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
@@ -299,9 +299,9 @@ export default function CourseDetails() {
                 <MdPictureAsPdf className="text-red-500" />
                 Apostila do Curso
               </h2>
-              <a 
-                href={course.pdf_url} 
-                target="_blank" 
+              <a
+                href={course.pdf_url}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-army-green/20 text-army-green-light hover:bg-army-green/40 hover:text-white rounded-lg transition-colors text-xs md:text-sm font-bold border border-army-green/30"
               >
@@ -309,9 +309,9 @@ export default function CourseDetails() {
                 <span className="hidden md:inline">Abrir em nova aba</span>
               </a>
             </div>
-            <iframe 
-              src={course.pdf_url?.includes('drive.google.com') ? course.pdf_url.replace(/\/view.*$/, '/preview') : (course.pdf_url?.includes('docs.google.com') ? course.pdf_url : `https://docs.google.com/viewer?url=${encodeURIComponent(course.pdf_url)}&embedded=true`)} 
-              className="w-full flex-1 border-0 bg-white" 
+            <iframe
+              src={course.pdf_url?.includes('drive.google.com') ? course.pdf_url.replace(/\/view.*$/, '/preview') : (course.pdf_url?.includes('docs.google.com') ? course.pdf_url : `https://docs.google.com/viewer?url=${encodeURIComponent(course.pdf_url)}&embedded=true`)}
+              className="w-full flex-1 border-0 bg-white"
               title="Visualizador PDF"
             ></iframe>
           </div>
@@ -322,9 +322,9 @@ export default function CourseDetails() {
                 <MdSlideshow className="text-orange-500" />
                 Apresentação de Slides
               </h2>
-              <a 
-                href={course.slides_url} 
-                target="_blank" 
+              <a
+                href={course.slides_url}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 bg-army-green/20 text-army-green-light hover:bg-army-green/40 hover:text-white rounded-lg transition-colors text-xs md:text-sm font-bold border border-army-green/30"
               >
@@ -332,9 +332,9 @@ export default function CourseDetails() {
                 <span className="hidden md:inline">Abrir em nova aba</span>
               </a>
             </div>
-            <iframe 
-              src={course.slides_url?.includes('drive.google.com') ? course.slides_url.replace(/\/view.*$/, '/preview') : (course.slides_url?.includes('docs.google.com') ? course.slides_url : `https://docs.google.com/viewer?url=${encodeURIComponent(course.slides_url)}&embedded=true`)} 
-              className="w-full flex-1 border-0 bg-white" 
+            <iframe
+              src={course.slides_url?.includes('drive.google.com') ? course.slides_url.replace(/\/view.*$/, '/preview') : (course.slides_url?.includes('docs.google.com') ? course.slides_url : `https://docs.google.com/viewer?url=${encodeURIComponent(course.slides_url)}&embedded=true`)}
+              className="w-full flex-1 border-0 bg-white"
               title="Visualizador Slides"
             ></iframe>
           </div>
@@ -353,10 +353,10 @@ export default function CourseDetails() {
               </div>
               <span
                 className={`text-[10px] font-bold tracking-wider px-3 py-1.5 rounded border uppercase whitespace-nowrap ${completedModules.includes(activeModuleId)
-                    ? 'border-green-700/50 text-green-400 bg-green-900/10'
-                    : isModuleUnlocked(activeModule)
-                      ? 'border-gold/50 text-gold bg-gold/10'
-                      : 'border-red-800/50 text-red-400 bg-red-900/10'
+                  ? 'border-green-700/50 text-green-400 bg-green-900/10'
+                  : isModuleUnlocked(activeModule)
+                    ? 'border-gold/50 text-gold bg-gold/10'
+                    : 'border-red-800/50 text-red-400 bg-red-900/10'
                   }`}
               >
                 {completedModules.includes(activeModuleId)
@@ -450,7 +450,7 @@ export default function CourseDetails() {
             <div className="flex items-start gap-3">
               <MdWarning className="text-red-500 text-xl flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-bold text-red-400 uppercase tracking-widest mb-1">Aviso: Sistema Anti-Cheat</h4>
+                <h4 className="text-sm font-bold text-red-400 uppercase tracking-widest mb-1">Aviso: Sistema Anti-Fraude</h4>
                 <p className="text-xs text-red-300/80 leading-relaxed">
                   As provas deste curso possuem sistema de monitoramento. Ao iniciar a prova, você não poderá sair da tela, trocar de aba ou minimizar a janela. Caso faça isso, a prova será anulada imediatamente com nota 0 e você perderá uma tentativa.
                 </p>
@@ -464,21 +464,17 @@ export default function CourseDetails() {
               const maxAttempts = exam.tentativas_permitidas;
               const attemptsLeft = maxAttempts - examAttempts.length;
               const isBlockedByAttempts = !passed && attemptsLeft <= 0;
-              
-              // Cooldown de 1 hora
+
               const lastAttempt = examAttempts[examAttempts.length - 1];
               let isCooldown = false;
               let cooldownMin = 0;
-              
-              const localBlockStr = localStorage.getItem(`exam_block_${exam.id}`);
-              const localBlockTime = localBlockStr ? parseInt(localBlockStr, 10) : 0;
-              
+
               const lastAttemptTime = lastAttempt ? new Date(lastAttempt.created_at || Date.now()).getTime() : 0;
-              const mostRecentBlock = Math.max(lastAttemptTime, localBlockTime);
-              
+              const mostRecentBlock = lastAttemptTime;
+
               if (!passed && mostRecentBlock > 0) {
                 const diffMs = Date.now() - mostRecentBlock;
-                const cooldownMs = 60 * 60 * 1000; // 1 hora
+                const cooldownMs = 5 * 60 * 1000; // 5 minutos
                 if (diffMs < cooldownMs) {
                   isCooldown = true;
                   cooldownMin = Math.ceil((cooldownMs - diffMs) / 60000);
@@ -510,8 +506,8 @@ export default function CourseDetails() {
                         <span
                           key={idx}
                           className={`text-[9px] font-bold px-2 py-0.5 rounded ${att.aprovado
-                              ? 'bg-green-500/20 text-green-400'
-                              : 'bg-red-500/20 text-red-400'
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-red-500/20 text-red-400'
                             }`}
                         >
                           T{idx + 1}: {att.nota}

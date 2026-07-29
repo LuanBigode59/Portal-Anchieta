@@ -4,7 +4,7 @@ import { useNotifications } from '../../contexts/NotificationContext';
 import { fardamentoService } from '../../services/fardamentoService';
 import { cargoLabels, ranks, cargoBadgeClass } from '../../data/ranks';
 import { 
-  MdAdd, MdContentCopy, MdClose, MdRefresh, MdImage, MdCheck, MdDelete
+  MdAdd, MdContentCopy, MdClose, MdRefresh, MdImage, MdCheck, MdDelete, MdChevronLeft, MdChevronRight
 } from 'react-icons/md';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -21,6 +21,23 @@ export default function Fardamentos() {
   
   // View Image Modal
   const [viewImage, setViewImage] = useState(null);
+  
+  // Carousel State
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState({});
+
+  const handleNextPhoto = (id, max) => {
+    setCurrentPhotoIndex(prev => ({
+      ...prev,
+      [id]: ((prev[id] || 0) + 1) % max
+    }));
+  };
+
+  const handlePrevPhoto = (id, max) => {
+    setCurrentPhotoIndex(prev => ({
+      ...prev,
+      [id]: ((prev[id] || 0) - 1 + max) % max
+    }));
+  };
   
   // Form state
   const [tipoFardamento, setTipoFardamento] = useState('patente');
@@ -253,51 +270,75 @@ export default function Fardamentos() {
             return (
               <div key={f.id} className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-[2rem] overflow-hidden flex flex-col hover:border-gold/30 transition-all duration-300 group shadow-lg">
                 
-                {/* Header Rank/Name */}
-                <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
+                {/* Header Rank/Name - Pequeno */}
+                <div className="px-4 py-3 flex items-center justify-between absolute top-0 left-0 right-0 z-20 pointer-events-none">
                   <div className="flex items-center gap-3">
-                    {isCustom ? (
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-lg text-sm font-bold uppercase tracking-wider">
-                        {nomeExibicao}
-                      </span>
-                    ) : (
-                      <span className={`${cargoBadgeClass[f.patente] || 'badge-steel'}`}>
-                        {nomeExibicao}
-                      </span>
-                    )}
+                    <span className="text-[10px] text-white/70 font-black uppercase tracking-widest bg-black/60 px-2 py-1 rounded-md backdrop-blur-sm shadow-lg pointer-events-auto border border-white/10">
+                      {nomeExibicao}
+                    </span>
                   </div>
                   {canAddFardamento && (
                     <button
                       onClick={() => handleDelete(f.id, f)}
-                      className="text-gray-500 hover:text-red-400 transition-colors p-2 rounded-full hover:bg-white/5"
+                      className="text-gray-400 hover:text-red-400 transition-colors p-1.5 rounded-md bg-black/60 backdrop-blur-sm pointer-events-auto border border-white/10"
                       title="Deletar Fardamento"
                     >
-                      <MdDelete size={18} />
+                      <MdDelete size={14} />
                     </button>
                   )}
                 </div>
 
                 {/* Photos Grid */}
-                <div className="bg-black/80 p-4">
+                <div className="bg-black/80 relative group/carousel rounded-t-[2rem] overflow-hidden">
                   {cardFotos.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-2 h-[350px]">
-                      {cardFotos.map((img, idx) => (
-                        <div 
-                          key={idx} 
-                          className="relative bg-white/5 rounded-xl border border-white/10 overflow-hidden cursor-pointer group/img hover:border-gold/50 transition-colors"
-                          onClick={() => setViewImage(img.url)}
-                          title={`Ampliar ${img.label}`}
-                        >
-                          <img 
-                            src={img.url} 
-                            alt={`${nomeExibicao} - ${img.label}`}
-                            className="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-300"
-                          />
-                          <div className="absolute bottom-0 inset-x-0 bg-black/60 text-center py-1 text-xs text-gray-300 font-bold uppercase tracking-widest backdrop-blur-sm">
-                            {img.label}
-                          </div>
+                    <div className="relative h-[350px] w-full">
+                      {cardFotos.length > 1 && (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePrevPhoto(f.id, cardFotos.length);
+                            }}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white rounded-full p-2 opacity-0 group-hover/carousel:opacity-100 transition-opacity"
+                          >
+                            <MdChevronLeft size={24} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNextPhoto(f.id, cardFotos.length);
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white rounded-full p-2 opacity-0 group-hover/carousel:opacity-100 transition-opacity"
+                          >
+                            <MdChevronRight size={24} />
+                          </button>
+                        </>
+                      )}
+                      
+                      <div 
+                        className="w-full h-full relative bg-white/5 rounded-xl border border-white/10 overflow-hidden cursor-pointer group/img hover:border-gold/50 transition-colors"
+                        onClick={() => setViewImage(cardFotos[currentPhotoIndex[f.id] || 0].url)}
+                      >
+                        <img 
+                          src={cardFotos[currentPhotoIndex[f.id] || 0].url} 
+                          alt={`${nomeExibicao} - Foto`}
+                          className="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      
+                      {/* Indicadores do carrossel */}
+                      {cardFotos.length > 1 && (
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                          {cardFotos.map((_, idx) => (
+                            <div 
+                              key={idx}
+                              className={`w-2 h-2 rounded-full transition-all ${
+                                (currentPhotoIndex[f.id] || 0) === idx ? 'bg-gold w-4' : 'bg-white/30'
+                              }`}
+                            />
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </div>
                   ) : (
                     <div className="h-[350px] flex items-center justify-center">

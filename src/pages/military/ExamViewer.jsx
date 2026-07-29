@@ -59,9 +59,13 @@ export default function ExamViewer() {
     loadExam();
   }, [id, user, navigate, sendNotification]);
 
+  const hasNotified = useRef(false);
+
   // Broadcast exam start to admins
   useEffect(() => {
-    if (!loading && exam && !result && user && timeLeft > 0) {
+    if (!loading && exam && !result && user && !hasNotified.current) {
+      hasNotified.current = true;
+      
       // Create a unique channel for broadcasting or use a general one
       const channel = supabase.channel('exam-alerts');
       
@@ -117,9 +121,8 @@ export default function ExamViewer() {
     const handleVisibilityChange = async () => {
       if (document.hidden && !loading && exam && !result && !isSubmitting) {
         // Anti-cheat detectou saída da página
-        
-        // Bloqueia no localStorage (1 hora)
-        localStorage.setItem(`exam_block_${exam.id}`, Date.now().toString());
+        // Apenas enviamos a tentativa falha, sem precisar travar no localStorage
+        // pois o CourseDetails já olhará para o banco.
         
         // Tenta enviar a nota 0 para o banco, mas não trava se der erro (RLS, etc)
         try {

@@ -134,5 +134,25 @@ export const examService = {
       .order('data_emissao', { ascending: false });
     if (error) throw error;
     return data || [];
+  },
+
+  async getBlockedUsers() {
+    const cincoMinutosAtras = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from('resultados_provas')
+      .select('*, profiles(nome, patente), provas(titulo)')
+      .eq('aprovado', false)
+      .gte('created_at', cincoMinutosAtras)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async unblockUser(resultadoId) {
+    const { error } = await supabase
+      .from('resultados_provas')
+      .delete()
+      .eq('id', resultadoId);
+    if (error) throw error;
   }
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Topbar from '../../components/layout/Topbar';
-import { MdQuiz, MdAdd, MdEdit, MdDelete, MdClose, MdSave, MdAddCircleOutline } from 'react-icons/md';
+import { MdQuiz, MdAdd, MdEdit, MdDelete, MdClose, MdSave, MdAddCircleOutline, MdCheckCircle } from 'react-icons/md';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { examService } from '../../services/examService';
 import { courseService } from '../../services/courseService';
@@ -12,6 +12,9 @@ export default function ManageExams() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  
+  const [activeTab, setActiveTab] = useState('provas');
+  const [blockedUsers, setBlockedUsers] = useState([]);
 
   const [formData, setFormData] = useState({
     curso_id: '',
@@ -27,12 +30,14 @@ export default function ManageExams() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [examsData, coursesData] = await Promise.all([
+      const [examsData, coursesData, blockedData] = await Promise.all([
         examService.getExams(),
-        courseService.getCourses()
+        courseService.getCourses(),
+        examService.getBlockedUsers()
       ]);
       setExams(examsData);
       setCourses(coursesData);
+      setBlockedUsers(blockedData);
     } catch (err) {
       sendNotification("Erro ao carregar banco de provas", 'erro');
     } finally {
@@ -145,21 +150,53 @@ export default function ManageExams() {
     }
   };
 
+  const handleUnblock = async (resultadoId, militarNome) => {
+    if (window.confirm(`Tem certeza que deseja liberar ${militarNome}? Isso apagará a última tentativa reprovada dele.`)) {
+      try {
+        await examService.unblockUser(resultadoId);
+        sendNotification("Militar liberado com sucesso!", 'sucesso');
+        loadData();
+      } catch (err) {
+        sendNotification("Erro ao liberar militar.", 'erro');
+      }
+    }
+  };
+
   return (
     <div className="animate-fadeIn pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <Topbar title="GERENCIAR PROVAS" subtitle="Banco de Questões e Avaliações" />
+        {activeTab === 'provas' && (
+          <button 
+            onClick={() => openModal()}
+            className="btn-green self-start sm:self-auto flex items-center justify-center gap-2"
+          >
+            <MdAdd className="text-xl" /> Nova Prova
+          </button>
+        )}
+      </div>
+
+      <div className="flex gap-4 border-b border-gray-800 mb-6">
         <button 
-          onClick={() => openModal()}
-          className="btn-green self-start sm:self-auto flex items-center justify-center gap-2"
+          className={`pb-3 px-2 text-sm font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'provas' ? 'border-gold text-gold' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+          onClick={() => setActiveTab('provas')}
         >
-          <MdAdd className="text-xl" /> Nova Prova
+          Banco de Provas
+        </button>
+        <button 
+          className={`pb-3 px-2 text-sm font-bold uppercase tracking-widest border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'bloqueados' ? 'border-red-500 text-red-500' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+          onClick={() => setActiveTab('bloqueados')}
+        >
+          Bloqueios Recentes
+          {blockedUsers.length > 0 && (
+            <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{blockedUsers.length}</span>
+          )}
         </button>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-20"><div className="spinner" /></div>
-      ) : (
+      ) : activeTab === 'provas' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {exams.map(exam => (
             <div key={exam.id} className="hero-card flex flex-col p-0 overflow-hidden">
@@ -202,6 +239,54 @@ export default function ManageExams() {
             <div className="col-span-full py-20 text-center text-gray-600">
               <MdQuiz className="text-5xl mx-auto mb-3 text-gray-700" />
               <p>Nenhuma prova cadastrada no banco.</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="bg-[#111] border border-gray-800 rounded-xl overflow-hidden">
+          {blockedUsers.length === 0 ? (
+            <div className="py-20 text-center text-gray-500">
+              <MdCheckCircle className="text-5xl mx-auto mb-3 text-gray-600" />
+              <p>Nenhum militar bloqueado por cooldown ou anti-fraude no momento.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-[#0a0a0a] border-b border-gray-800">
+                    <th className="p-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Militar</th>
+                    <th className="p-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Prova</th>
+                    <th className="p-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Nota</th>
+                    <th className="p-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right">Ação</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800">
+                  {blockedUsers.map(user => (
+                    <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-4">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-gray-200">{user.profiles?.nome}</span>
+                          <span className="text-[10px] text-gray-500 uppercase tracking-widest">{user.profiles?.patente}</span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="text-sm text-gray-300">{user.provas?.titulo}</span>
+                      </td>
+                      <td className="p-4">
+                        <span className="text-sm font-bold text-red-500">{user.nota}</span>
+                      </td>
+                      <td className="p-4 text-right">
+                        <button 
+                          onClick={() => handleUnblock(user.id, user.profiles?.nome)}
+                          className="px-3 py-1.5 bg-green-500/20 text-green-400 hover:bg-green-500 hover:text-black border border-green-500/30 rounded-lg text-xs font-bold uppercase tracking-widest transition-colors"
+                        >
+                          Liberar Agora
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
