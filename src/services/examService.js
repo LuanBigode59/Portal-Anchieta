@@ -137,15 +137,22 @@ export const examService = {
   },
 
   async getBlockedUsers() {
-    const dezMinutosAtras = new Date(Date.now() - 10 * 60 * 1000).toISOString();
     const { data, error } = await supabase
       .from('resultados_provas')
       .select('*, profiles(nome, patente), provas(titulo)')
       .eq('aprovado', false)
-      .gte('created_at', dezMinutosAtras)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(30);
     if (error) throw error;
-    return data || [];
+    
+    const now = Date.now();
+    // Filtra localmente dando margem para diferença de fuso horário/relógio (ex: 15 minutos)
+    const limiteMs = 15 * 60 * 1000;
+    
+    return (data || []).filter(item => {
+      const itemTime = new Date(item.created_at).getTime();
+      return (now - itemTime) < limiteMs;
+    });
   },
 
   async unblockUser(resultadoId) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Topbar from '../../components/layout/Topbar';
-import { MdQuiz, MdAdd, MdEdit, MdDelete, MdClose, MdSave, MdAddCircleOutline, MdCheckCircle } from 'react-icons/md';
+import { MdQuiz, MdAdd, MdEdit, MdDelete, MdClose, MdSave, MdAddCircleOutline, MdCheckCircle, MdRefresh } from 'react-icons/md';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { examService } from '../../services/examService';
 import { courseService } from '../../services/courseService';
@@ -176,7 +176,7 @@ export default function ManageExams() {
         )}
       </div>
 
-      <div className="flex gap-4 border-b border-gray-800 mb-6">
+      <div className="flex gap-4 border-b border-gray-800 mb-6 relative">
         <button 
           className={`pb-3 px-2 text-sm font-bold uppercase tracking-widest border-b-2 transition-colors ${activeTab === 'provas' ? 'border-gold text-gold' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
           onClick={() => setActiveTab('provas')}
@@ -192,6 +192,14 @@ export default function ManageExams() {
             <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{blockedUsers.length}</span>
           )}
         </button>
+        {activeTab === 'bloqueados' && (
+          <button 
+            onClick={loadData}
+            className="absolute right-0 bottom-2 flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors"
+          >
+            <MdRefresh className="text-lg" /> Atualizar
+          </button>
+        )}
       </div>
 
       {loading ? (
