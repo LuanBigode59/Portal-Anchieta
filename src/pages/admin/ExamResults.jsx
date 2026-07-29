@@ -1,27 +1,50 @@
 import { useState, useEffect } from 'react';
 import Topbar from '../../components/layout/Topbar';
 import { examService } from '../../services/examService';
-import { MdAssignment, MdCheckCircle, MdCancel, MdClose, MdVisibility } from 'react-icons/md';
+import { MdAssignment, MdCheckCircle, MdCancel, MdClose, MdVisibility, MdDelete } from 'react-icons/md';
 import { cargoBadgeClass, cargoLabels } from '../../data/ranks';
+import { supabase } from '../../lib/supabase';
 
 export default function ExamResults() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedResult, setSelectedResult] = useState(null);
 
+  const loadResults = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('resultados_provas')
+        .select(`
+          *,
+          provas ( titulo, id ),
+          profiles ( nome, patente )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setResults(data || []);
+    } catch (err) {
+      console.error("Erro ao carregar resultados:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    async function loadData() {
+    loadResults();
+  }, []);
+
+  const handleDelete = async (resultadoId, nome) => {
+    if (window.confirm(`Tem certeza que deseja DELETAR a tentativa de ${nome}? Isso removerá a nota e a aprovação, permitindo que ele faça a prova novamente.`)) {
       try {
-        const data = await examService.getAllDetailedResults();
-        setResults(data);
+        await examService.unblockUser(resultadoId);
+        loadResults();
       } catch (err) {
-        console.error("Erro ao carregar resultados:", err);
-      } finally {
-        setLoading(false);
+        console.error("Erro ao deletar tentativa:", err);
       }
     }
-    loadData();
-  }, []);
+  };
 
   const openDetails = (res) => {
     setSelectedResult(res);
@@ -80,13 +103,20 @@ export default function ExamResults() {
                         </span>
                       )}
                     </td>
-                    <td className="text-center">
+                    <td className="text-center flex justify-center gap-2">
                       <button 
                         onClick={() => openDetails(res)}
                         className="btn-secondary !p-1.5 inline-flex items-center"
                         title="Ver Respostas"
                       >
                         <MdVisibility className="text-lg" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(res.id, res.profiles?.nome)}
+                        className="btn-danger !p-1.5 inline-flex items-center"
+                        title="Deletar Tentativa"
+                      >
+                        <MdDelete className="text-lg" />
                       </button>
                     </td>
                   </tr>

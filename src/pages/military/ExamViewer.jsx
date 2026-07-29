@@ -37,16 +37,16 @@ export default function ExamViewer() {
         if (user && user.id) {
           const attempts = await examService.getAttempts(user.id, id);
           const passed = attempts.find(a => a.aprovado);
-          
+
           if (passed) {
-             setResult(passed);
-             // Get certificate if exists
-             const certs = await examService.getCertificatesByUser(user.id);
-             const myCert = certs.find(c => c.curso_id === examData.curso_id);
-             if (myCert) setCertificate(myCert);
+            setResult(passed);
+            // Get certificate if exists
+            const certs = await examService.getCertificatesByUser(user.id);
+            const myCert = certs.find(c => c.curso_id === examData.curso_id);
+            if (myCert) setCertificate(myCert);
           } else if (attempts.length >= examData.tentativas_permitidas) {
-             sendNotification("Você excedeu o limite de tentativas para esta prova.", "erro");
-             navigate(`/militar/cursos/${examData.curso_id}`);
+            sendNotification("Você excedeu o limite de tentativas para esta prova.", "erro");
+            navigate(`/militar/cursos/${examData.curso_id}`);
           }
         }
       } catch (err) {
@@ -65,10 +65,10 @@ export default function ExamViewer() {
   useEffect(() => {
     if (!loading && exam && !result && user && !hasNotified.current) {
       hasNotified.current = true;
-      
+
       // Create a unique channel for broadcasting or use a general one
       const channel = supabase.channel('exam-alerts');
-      
+
       channel.subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           channel.send({
@@ -123,16 +123,16 @@ export default function ExamViewer() {
         // Anti-cheat detectou saída da página
         // Apenas enviamos a tentativa falha, sem precisar travar no localStorage
         // pois o CourseDetails já olhará para o banco.
-        
+
         // Tenta enviar a nota 0 para o banco, mas não trava se der erro (RLS, etc)
         try {
-          await handleSubmit(null, true, true); 
+          await handleSubmit(null, true, true);
         } catch (e) {
           console.error("Erro ao salvar penalidade no banco:", e);
         }
-        
-        sendNotification("MODO ANTI-CHEAT ATIVADO: Você saiu da página ou trocou de aba. Sua prova foi anulada e bloqueada por 1 hora.", "erro");
-        
+
+        sendNotification("MODO ANTI-FRAUDE ATIVADO: Você saiu da página ou trocou de aba. Sua prova foi anulada e bloqueada por 10 minutos.", "erro");
+
         // Fecha a prova imediatamente e volta pro curso
         navigate(`/militar/cursos/${exam.curso_id}`);
       }
@@ -160,7 +160,7 @@ export default function ExamViewer() {
   const handleSubmit = async (e, isAutoSubmit = false, isCheating = false) => {
     if (e) e.preventDefault();
     if (result) return;
-    
+
     if (!isAutoSubmit && !isCheating && Object.keys(answers).length < exam.perguntas.length) {
       if (!window.confirm("Você não respondeu todas as perguntas. Deseja enviar mesmo assim? As não respondidas serão consideradas erradas.")) {
         return;
@@ -178,12 +178,12 @@ export default function ExamViewer() {
       const attemptCount = attempts.length + 1;
 
       const { resultado, certificado } = await examService.submitExam(
-        user.id, 
-        exam.id, 
-        exam.curso_id, 
-        answers, 
-        score, 
-        isApproved, 
+        user.id,
+        exam.id,
+        exam.curso_id,
+        answers,
+        score,
+        isApproved,
         attemptCount
       );
 
@@ -248,7 +248,7 @@ export default function ExamViewer() {
             <h1 className="text-2xl font-black text-white mb-1">{exam.titulo}</h1>
             <p className="text-sm text-gray-500 uppercase tracking-widest font-bold">{exam.cursos?.nome}</p>
           </div>
-          
+
           {!result && (
             <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${timeLeft < 300 ? 'bg-danger/20 border-danger animate-pulse' : 'bg-mil-black border-gray-800'}`}>
               <MdTimer className={`text-2xl ${timeLeft < 300 ? 'text-danger-light' : 'text-gold'}`} />
@@ -273,7 +273,7 @@ export default function ExamViewer() {
             {result.aprovado ? 'APROVADO!' : 'REPROVADO'}
           </h2>
           <p className="text-gray-400 mb-6">
-            Sua nota foi <span className="text-white font-bold text-lg">{result.nota}</span> / 100 
+            Sua nota foi <span className="text-white font-bold text-lg">{result.nota}</span> / 100
             (Mínimo: {exam.nota_aprovacao})
           </p>
 
@@ -307,7 +307,7 @@ export default function ExamViewer() {
                   const isSelected = userAnswer === aIndex;
                   let bgClass = "bg-[#111] border-gray-800 hover:border-gray-600";
                   let textClass = "text-gray-400";
-                  
+
                   if (result) {
                     // Modo Visualização de Correção
                     if (aIndex === q.corretaIndex) {
@@ -324,8 +324,8 @@ export default function ExamViewer() {
                   }
 
                   return (
-                    <div 
-                      key={aIndex} 
+                    <div
+                      key={aIndex}
                       onClick={() => handleSelect(qIndex, aIndex)}
                       className={`p-3 rounded-lg border transition-all cursor-pointer flex items-center gap-3 ${bgClass} ${result ? 'cursor-default' : ''}`}
                     >
@@ -345,8 +345,8 @@ export default function ExamViewer() {
 
         {!result && (
           <div className="sticky bottom-4 z-10 flex justify-end">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isSubmitting}
               className="btn-gold !py-4 !px-8 shadow-[0_10px_30px_rgba(201,168,76,0.3)] flex items-center gap-2 text-sm"
             >
