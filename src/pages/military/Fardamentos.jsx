@@ -40,10 +40,11 @@ export default function Fardamentos() {
   };
   
   // Form state
-  const [tipoFardamento, setTipoFardamento] = useState('patente');
-  const [patenteSelecionada, setPatenteSelecionada] = useState('');
-  const [nomeCustomizado, setNomeCustomizado] = useState('');
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState('');
+  const [novaCategoria, setNovaCategoria] = useState('');
   const [descricao, setDescricao] = useState('');
+  
+  const categoriasPreDefinidas = ['Operacional', 'Guardião', 'Rocam', 'Interno', 'Gala'];
   
   const [fotos, setFotos] = useState({
     frente: null,
@@ -104,12 +105,11 @@ export default function Fardamentos() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (tipoFardamento === 'patente' && !patenteSelecionada) {
-      addNotification('erro', 'Selecione uma patente.');
-      return;
-    }
-    if (tipoFardamento === 'custom' && !nomeCustomizado) {
-      addNotification('erro', 'Digite o nome do fardamento.');
+    
+    const categoriaFinal = categoriaSelecionada === 'nova' ? novaCategoria : categoriaSelecionada;
+
+    if (!categoriaFinal) {
+      addNotification('erro', 'Selecione ou digite uma categoria.');
       return;
     }
     if (!descricao) {
@@ -136,8 +136,8 @@ export default function Fardamentos() {
       
       // Save record
       await fardamentoService.adicionarFardamento({
-        patente: tipoFardamento === 'patente' ? patenteSelecionada : null,
-        nome: tipoFardamento === 'custom' ? nomeCustomizado : null,
+        patente: categoriaFinal, // Salvamos a categoria no campo patente para não precisar alterar o BD
+        nome: null,
         descricao,
         foto_url: urlFrente,
         foto_lado_direito: urlLadoDireito,
@@ -150,9 +150,8 @@ export default function Fardamentos() {
       setIsModalOpen(false);
       
       // Reset form
-      setTipoFardamento('patente');
-      setPatenteSelecionada('');
-      setNomeCustomizado('');
+      setCategoriaSelecionada('');
+      setNovaCategoria('');
       setDescricao('');
       setFotos({ frente: null, ladoDireito: null, ladoEsquerdo: null, costas: null });
       setFotosPreview({ frente: null, ladoDireito: null, ladoEsquerdo: null, costas: null });
@@ -253,12 +252,23 @@ export default function Fardamentos() {
           <p className="text-gray-500 mt-2">Aguarde os oficiais adicionarem os modelos.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
-          {fardamentos.map((f) => {
-            const isCustom = !f.patente && f.nome;
-            // Se for custom, todos podem usar/copiar. Se for patente, só quem tem a patente.
-            const canUse = isCustom || user?.cargo === f.patente;
-            const nomeExibicao = isCustom ? f.nome : (cargoLabels[f.patente] || f.patente);
+        <div className="space-y-12">
+          {Object.entries(
+            fardamentos.reduce((acc, curr) => {
+              // Usa 'patente' como Categoria. Se for null (antigos), usa 'nome' ou 'Antigos'
+              const cat = curr.patente || (curr.nome ? `Antigos - ${curr.nome}` : 'Sem Categoria');
+              if (!acc[cat]) acc[cat] = [];
+              acc[cat].push(curr);
+              return acc;
+            }, {})
+          ).map(([categoria, fards]) => (
+            <div key={categoria} className="space-y-6">
+              <h2 className="text-2xl font-black text-white/90 uppercase tracking-widest border-b border-white/10 pb-2">
+                {cargoLabels[categoria] || categoria}
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
+                {fards.map((f) => {
+                  const nomeExibicao = f.nome || categoria;
             
             const cardFotos = [
               { url: f.foto_url, label: 'Frente' },
@@ -274,7 +284,7 @@ export default function Fardamentos() {
                 <div className="px-4 py-3 flex items-center justify-between absolute top-0 left-0 right-0 z-20 pointer-events-none">
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] text-white/70 font-black uppercase tracking-widest bg-black/60 px-2 py-1 rounded-md backdrop-blur-sm shadow-lg pointer-events-auto border border-white/10">
-                      {nomeExibicao}
+                      {f.nome || "Uniforme Padrão"}
                     </span>
                   </div>
                   {canAddFardamento && (
@@ -350,27 +360,21 @@ export default function Fardamentos() {
                 {/* Description & Action */}
                 <div className="p-6 flex flex-col flex-1 border-t border-white/10">
                   <div className="mt-auto">
-                    {canUse ? (
-                      <button
-                        onClick={() => handleCopy(f.descricao)}
-                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-[#111] font-black uppercase tracking-widest hover:brightness-110 shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all"
-                      >
-                        <MdContentCopy size={18} />
-                        Copiar Fardamento
-                      </button>
-                    ) : (
-                      <div className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-center flex items-center justify-center gap-2 text-gray-500 cursor-not-allowed">
-                        <MdCheck size={18} className="text-gray-600" />
-                        <span className="text-[10px] uppercase font-bold tracking-widest">
-                          Apenas para {cargoLabels[f.patente]}
-                        </span>
-                      </div>
-                    )}
+                    <button
+                      onClick={() => handleCopy(f.descricao)}
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-[#111] font-black uppercase tracking-widest hover:brightness-110 shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all"
+                    >
+                      <MdContentCopy size={18} />
+                      Copiar Fardamento
+                    </button>
                   </div>
                 </div>
               </div>
             )
           })}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -392,65 +396,38 @@ export default function Fardamentos() {
 
             <form onSubmit={handleSave} className="p-6 space-y-5 overflow-y-auto custom-scrollbar">
               
-              {/* Tipo de Fardamento */}
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="tipoFardamento" 
-                    value="patente" 
-                    checked={tipoFardamento === 'patente'}
-                    onChange={(e) => setTipoFardamento(e.target.value)}
-                    className="accent-gold"
-                  />
-                  <span className="text-sm font-bold text-gray-300">Vincular a Patente</span>
+              {/* Categoria do Fardamento */}
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                  Categoria
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="tipoFardamento" 
-                    value="custom" 
-                    checked={tipoFardamento === 'custom'}
-                    onChange={(e) => setTipoFardamento(e.target.value)}
-                    className="accent-gold"
-                  />
-                  <span className="text-sm font-bold text-gray-300">Nome Customizado</span>
-                </label>
-              </div>
+                <select
+                  required
+                  value={categoriaSelecionada}
+                  onChange={(e) => {
+                    setCategoriaSelecionada(e.target.value);
+                    if (e.target.value !== 'nova') setNovaCategoria('');
+                  }}
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-gray-200 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all appearance-none mb-3"
+                >
+                  <option value="">Selecione uma categoria...</option>
+                  {categoriasPreDefinidas.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                  <option value="nova">+ Criar Nova Categoria</option>
+                </select>
 
-              {/* Patente ou Nome Customizado */}
-              {tipoFardamento === 'patente' ? (
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-                    Patente
-                  </label>
-                  <select
-                    required
-                    value={patenteSelecionada}
-                    onChange={(e) => setPatenteSelecionada(e.target.value)}
-                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-gray-200 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all appearance-none"
-                  >
-                    <option value="">Selecione uma patente...</option>
-                    {ranks.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-                    Nome do Fardamento
-                  </label>
+                {categoriaSelecionada === 'nova' && (
                   <input
                     type="text"
                     required
-                    value={nomeCustomizado}
-                    onChange={(e) => setNomeCustomizado(e.target.value)}
-                    placeholder="Ex: Fardamento Especial BOPE"
-                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-gray-200 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all"
+                    value={novaCategoria}
+                    onChange={(e) => setNovaCategoria(e.target.value)}
+                    placeholder="Ex: Choqueano, Inverno, etc..."
+                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-gray-200 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all animate-fade-in"
                   />
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Fotos */}
               <div>
