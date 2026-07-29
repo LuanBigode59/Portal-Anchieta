@@ -265,25 +265,33 @@ export default function Fardamentos() {
             }, {});
 
             if (!categoriaAberta) {
+              const todasCategorias = Array.from(new Set([
+                ...categoriasPreDefinidas,
+                ...Object.keys(groupedFardamentos)
+              ]));
+
               return (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {Object.entries(groupedFardamentos).map(([categoria, fards]) => (
-                    <button
-                      key={categoria}
-                      onClick={() => setCategoriaAberta(categoria)}
-                      className="group relative flex flex-col items-center justify-center p-8 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[2rem] hover:border-gold/30 hover:bg-white/5 transition-all duration-300 shadow-lg text-center"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 border border-white/10 group-hover:scale-110 transition-transform">
-                        <MdCheck className="text-3xl text-gray-500 group-hover:text-gold transition-colors" />
-                      </div>
-                      <h3 className="text-lg font-black text-white/90 uppercase tracking-widest group-hover:text-gold transition-colors">
-                        {cargoLabels[categoria] || categoria}
-                      </h3>
-                      <p className="text-xs text-gray-500 mt-2 uppercase font-bold tracking-widest">
-                        {fards.length} Fardamento{fards.length !== 1 ? 's' : ''}
-                      </p>
-                    </button>
-                  ))}
+                  {todasCategorias.map((categoria) => {
+                    const fards = groupedFardamentos[categoria] || [];
+                    return (
+                      <button
+                        key={categoria}
+                        onClick={() => setCategoriaAberta(categoria)}
+                        className="group relative flex flex-col items-center justify-center p-8 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[2rem] hover:border-gold/30 hover:bg-white/5 transition-all duration-300 shadow-lg text-center"
+                      >
+                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 border border-white/10 group-hover:scale-110 transition-transform">
+                          <MdCheck className="text-3xl text-gray-500 group-hover:text-gold transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-black text-white/90 uppercase tracking-widest group-hover:text-gold transition-colors">
+                          {cargoLabels[categoria] || categoria}
+                        </h3>
+                        <p className="text-xs text-gray-500 mt-2 uppercase font-bold tracking-widest">
+                          {fards.length} Fardamento{fards.length !== 1 ? 's' : ''}
+                        </p>
+                      </button>
+                    );
+                  })}
                 </div>
               );
             }
