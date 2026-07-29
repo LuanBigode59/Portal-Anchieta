@@ -45,6 +45,7 @@ export default function Fardamentos() {
   // Form state
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('');
   const [novaCategoria, setNovaCategoria] = useState('');
+  const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   
   const categoriasPreDefinidas = ['Operacionais', 'Guardião', 'Rocam', 'Interno', 'Gala', 'Degem'];
@@ -140,7 +141,7 @@ export default function Fardamentos() {
       // Save record
       await fardamentoService.adicionarFardamento({
         patente: categoriaFinal, // Salvamos a categoria no campo patente para não precisar alterar o BD
-        nome: null,
+        nome: nome || null,
         descricao,
         foto_url: urlFrente,
         foto_lado_direito: urlLadoDireito,
@@ -155,6 +156,7 @@ export default function Fardamentos() {
       // Reset form
       setCategoriaSelecionada('');
       setNovaCategoria('');
+      setNome('');
       setDescricao('');
       setFotos({ frente: null, ladoDireito: null, ladoEsquerdo: null, costas: null });
       setFotosPreview({ frente: null, ladoDireito: null, ladoEsquerdo: null, costas: null });
@@ -475,6 +477,20 @@ export default function Fardamentos() {
                     className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-gray-200 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all animate-fade-in"
                   />
                 )}
+              </div>
+
+              {/* Nome do Fardamento */}
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                  Nome do Fardamento (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Ex: Tenente-Coronel, Instrutor..."
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-gray-200 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30 transition-all"
+                />
               </div>
 
               {/* Fotos */}
