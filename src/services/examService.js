@@ -142,10 +142,17 @@ export const examService = {
       .select('*, profiles(nome, patente), provas(titulo)')
       .eq('aprovado', false)
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(30);
     if (error) throw error;
     
-    return data || [];
+    const now = Date.now();
+    const cooldownMs = 10 * 60 * 1000; // 10 minutos
+    
+    return (data || []).filter(item => {
+      const itemTime = new Date(item.created_at).getTime();
+      // Mostra apenas quem está dentro da janela de 10 minutos do cooldown
+      return (now - itemTime) <= cooldownMs;
+    });
   },
 
   async unblockUser(resultadoId) {
