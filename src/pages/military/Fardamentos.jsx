@@ -331,7 +331,7 @@ export default function Fardamentos() {
                         <div className="px-4 py-3 flex items-center justify-between absolute top-0 left-0 right-0 z-20 pointer-events-none">
                           <div className="flex items-center gap-3">
                             <span className="text-[10px] text-white/70 font-black uppercase tracking-widest bg-black/60 px-2 py-1 rounded-md backdrop-blur-sm shadow-lg pointer-events-auto border border-white/10">
-                              {f.nome || "Uniforme Padrão"}
+                              {f.nome || cargoLabels[f.patente] || f.patente || "Uniforme Padrão"}
                             </span>
                           </div>
                           {canAddFardamento && (
