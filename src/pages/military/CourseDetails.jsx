@@ -474,7 +474,7 @@ export default function CourseDetails() {
 
               if (!passed && mostRecentBlock > 0) {
                 const diffMs = Date.now() - mostRecentBlock;
-                const cooldownMs = 5 * 60 * 1000; // 5 minutos
+                const cooldownMs = 10 * 60 * 1000; // 10 minutos
                 if (diffMs < cooldownMs) {
                   isCooldown = true;
                   cooldownMin = Math.ceil((cooldownMs - diffMs) / 60000);

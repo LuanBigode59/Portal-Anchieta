@@ -137,12 +137,12 @@ export const examService = {
   },
 
   async getBlockedUsers() {
-    const cincoMinutosAtras = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const dezMinutosAtras = new Date(Date.now() - 10 * 60 * 1000).toISOString();
     const { data, error } = await supabase
       .from('resultados_provas')
       .select('*, profiles(nome, patente), provas(titulo)')
       .eq('aprovado', false)
-      .gte('created_at', cincoMinutosAtras)
+      .gte('created_at', dezMinutosAtras)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
