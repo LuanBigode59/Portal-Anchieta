@@ -142,17 +142,10 @@ export const examService = {
       .select('*, profiles(nome, patente), provas(titulo)')
       .eq('aprovado', false)
       .order('created_at', { ascending: false })
-      .limit(30);
+      .limit(20);
     if (error) throw error;
     
-    const now = Date.now();
-    // Filtra localmente dando margem para diferença de fuso horário/relógio (ex: 15 minutos)
-    const limiteMs = 15 * 60 * 1000;
-    
-    return (data || []).filter(item => {
-      const itemTime = new Date(item.created_at).getTime();
-      return (now - itemTime) < limiteMs;
-    });
+    return data || [];
   },
 
   async unblockUser(resultadoId) {
