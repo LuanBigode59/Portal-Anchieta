@@ -47,7 +47,7 @@ export default function Fardamentos() {
   const [novaCategoria, setNovaCategoria] = useState('');
   const [descricao, setDescricao] = useState('');
   
-  const categoriasPreDefinidas = ['Operacional', 'Guardião', 'Rocam', 'Interno', 'Gala'];
+  const categoriasPreDefinidas = ['Operacionais', 'Guardião', 'Rocam', 'Interno', 'Gala', 'Degem'];
   
   const [fotos, setFotos] = useState({
     frente: null,
@@ -258,17 +258,17 @@ export default function Fardamentos() {
         <div className="space-y-12">
           {(() => {
             const groupedFardamentos = fardamentos.reduce((acc, curr) => {
-              const cat = curr.patente || (curr.nome ? `Antigos - ${curr.nome}` : 'Sem Categoria');
+              let cat = curr.patente || (curr.nome ? `Antigos - ${curr.nome}` : 'Sem Categoria');
+              if (cat === 'Operacional' || !categoriasPreDefinidas.includes(cat)) {
+                cat = 'Operacionais';
+              }
               if (!acc[cat]) acc[cat] = [];
               acc[cat].push(curr);
               return acc;
             }, {});
 
             if (!categoriaAberta) {
-              const todasCategorias = Array.from(new Set([
-                ...categoriasPreDefinidas,
-                ...Object.keys(groupedFardamentos)
-              ]));
+              const todasCategorias = [...categoriasPreDefinidas];
 
               return (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
