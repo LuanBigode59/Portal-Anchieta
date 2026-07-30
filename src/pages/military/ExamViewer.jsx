@@ -152,7 +152,14 @@ export default function ExamViewer() {
   const calculateScore = () => {
     let correctCount = 0;
     exam.perguntas.forEach((q, index) => {
-      if (answers[index] === q.corretaIndex) correctCount++;
+      const userAnswer = answers[index];
+      if (!q.tipo || q.tipo === 'alternativas') {
+        if (userAnswer === q.corretaIndex) correctCount++;
+      } else if (q.tipo === 'texto') {
+        if (userAnswer && typeof userAnswer === 'string' && q.respostaCorretaTexto && userAnswer.trim().toLowerCase() === q.respostaCorretaTexto.trim().toLowerCase()) {
+          correctCount++;
+        }
+      }
     });
     return Math.round((correctCount / exam.perguntas.length) * 100);
   };
@@ -303,41 +310,60 @@ export default function ExamViewer() {
                 <p className="text-sm text-gray-200 mt-2 font-medium">{q.pergunta}</p>
               </div>
               <div className="p-4 bg-[#0a0a0a] space-y-2">
-                {q.alternativas.map((alt, aIndex) => {
-                  const isSelected = userAnswer === aIndex;
-                  let bgClass = "bg-[#111] border-gray-800 hover:border-gray-600";
-                  let textClass = "text-gray-400";
+                {(!q.tipo || q.tipo === 'alternativas') ? (
+                  q.alternativas.map((alt, aIndex) => {
+                    const isSelected = userAnswer === aIndex;
+                    let bgClass = "bg-[#111] border-gray-800 hover:border-gray-600";
+                    let textClass = "text-gray-400";
 
-                  if (result) {
-                    // Modo Visualização de Correção
-                    if (aIndex === q.corretaIndex) {
-                      bgClass = "bg-green-500/20 border-green-500/50";
-                      textClass = "text-green-400 font-bold";
+                    if (result) {
+                      // Modo Visualização de Correção
+                      if (aIndex === q.corretaIndex) {
+                        bgClass = "bg-green-500/20 border-green-500/50";
+                        textClass = "text-green-400 font-bold";
+                      } else if (isSelected) {
+                        bgClass = "bg-red-500/20 border-red-500/50";
+                        textClass = "text-red-400 font-bold";
+                      }
                     } else if (isSelected) {
-                      bgClass = "bg-red-500/20 border-red-500/50";
-                      textClass = "text-red-400 font-bold";
+                      // Modo Respondendo
+                      bgClass = "bg-army-green/20 border-army-green";
+                      textClass = "text-white font-bold";
                     }
-                  } else if (isSelected) {
-                    // Modo Respondendo
-                    bgClass = "bg-army-green/20 border-army-green";
-                    textClass = "text-white font-bold";
-                  }
 
-                  return (
-                    <div
-                      key={aIndex}
-                      onClick={() => handleSelect(qIndex, aIndex)}
-                      className={`p-3 rounded-lg border transition-all cursor-pointer flex items-center gap-3 ${bgClass} ${result ? 'cursor-default' : ''}`}
-                    >
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 ${isSelected ? 'border-army-green bg-army-green text-black' : 'border-gray-600'}`}>
-                        {isSelected && !result && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
-                        {result && aIndex === q.corretaIndex && <MdCheckCircle className="text-green-500" />}
-                        {result && isSelected && aIndex !== q.corretaIndex && <MdCancel className="text-red-500" />}
+                    return (
+                      <div
+                        key={aIndex}
+                        onClick={() => handleSelect(qIndex, aIndex)}
+                        className={`p-3 rounded-lg border transition-all cursor-pointer flex items-center gap-3 ${bgClass} ${result ? 'cursor-default' : ''}`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 ${isSelected ? 'border-army-green bg-army-green text-black' : 'border-gray-600'}`}>
+                          {isSelected && !result && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
+                          {result && aIndex === q.corretaIndex && <MdCheckCircle className="text-green-500" />}
+                          {result && isSelected && aIndex !== q.corretaIndex && <MdCancel className="text-red-500" />}
+                        </div>
+                        <span className={`text-sm ${textClass}`}>{alt}</span>
                       </div>
-                      <span className={`text-sm ${textClass}`}>{alt}</span>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                ) : (
+                  <div>
+                    <input 
+                      type="text"
+                      value={userAnswer || ''}
+                      onChange={(e) => handleSelect(qIndex, e.target.value)}
+                      disabled={result !== null}
+                      className={`mil-input w-full ${result ? (userAnswer?.trim().toLowerCase() === q.respostaCorretaTexto?.trim().toLowerCase() ? 'border-green-500 text-green-400' : 'border-red-500 text-red-400') : ''}`}
+                      placeholder="Digite sua resposta..."
+                    />
+                    {result && userAnswer?.trim().toLowerCase() !== q.respostaCorretaTexto?.trim().toLowerCase() && (
+                      <p className="text-xs text-green-500 mt-2 font-bold flex items-center gap-1"><MdCheckCircle /> Resposta correta: {q.respostaCorretaTexto}</p>
+                    )}
+                    {result && userAnswer?.trim().toLowerCase() === q.respostaCorretaTexto?.trim().toLowerCase() && (
+                      <p className="text-xs text-green-500 mt-2 font-bold flex items-center gap-1"><MdCheckCircle /> Resposta correta!</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           );

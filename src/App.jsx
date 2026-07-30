@@ -36,6 +36,9 @@ import Copom from './pages/military/Copom';
 import PontoEletronico from './pages/military/PontoEletronico';
 import EmServico from './pages/military/EmServico';
 import Fardamentos from './pages/military/Fardamentos';
+import Elogios from './pages/military/Elogios';
+import Reclamacoes from './pages/military/Reclamacoes';
+import Sugestoes from './pages/military/Sugestoes';
 
 // Admin Pages
 import AdminPanel from './pages/admin/AdminPanel';
@@ -117,6 +120,9 @@ export default function App() {
             <Route path="ponto" element={<PontoEletronico />} />
             <Route path="em-servico" element={<EmServico />} />
             <Route path="fardamentos" element={<Fardamentos />} />
+            <Route path="elogios" element={<Elogios />} />
+            <Route path="reclamacoes" element={<Reclamacoes />} />
+            <Route path="sugestoes" element={<Sugestoes />} />
           </Route>
 
           {/* Protected Command Area */}

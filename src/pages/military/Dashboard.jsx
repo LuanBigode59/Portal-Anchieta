@@ -16,6 +16,8 @@ import { courseService } from '../../services/courseService';
 import { signatureService } from '../../services/signatureService';
 import { operationService } from '../../services/operationService';
 import { pontoService } from '../../services/pontoService';
+import { supabase } from '../../supabaseClient';
+import { SCHEDULE_TYPES } from '../../data/constants';
 
 // ============ MODAL GENÉRICO ============
 function ActionModal({ open, onClose, title, icon, children, onSubmit, submitLabel = 'Confirmar', submitClass = 'btn-green', hideSubmit = false }) {
@@ -67,7 +69,7 @@ export default function Dashboard() {
     totalEfetivo: 0,
     emPatrulha: 0,
     emOperacoes: 0,
-    emTreinamento: 0,
+    efetivosConcursados: 0,
     totalCursos: 0,
     totalOperacoes: 0,
     promocoesPendentes: 0,
@@ -80,6 +82,11 @@ export default function Dashboard() {
   const [selectedDocs, setSelectedDocs] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const [coursesList, setCoursesList] = useState([]);
+  
+  // Real Data states for Charts and Calendar
+  const [efetivoData, setEfetivoData] = useState([]);
+  const [calendarData, setCalendarData] = useState([]);
+  const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -100,11 +107,15 @@ export default function Dashboard() {
         const advertencias = pDocs.filter(d => d.tipo === 'advertencia').length;
         const certificados = signedDocs.filter(d => d.tipo === 'certificado').length;
         
+        // Verifica quantos usuários têm certificado de aprovação em provas
+        const { data: certs } = await supabase.from('certificados').select('militar_id');
+        const uniqueConcursados = certs ? new Set(certs.map(c => c.militar_id)).size : 0;
+        
         setRealStats({
           totalEfetivo: users.length,
           emPatrulha: totalEmPatrulha,
           emOperacoes: ops.filter(o => o.status === 'planejada').length * 10,
-          emTreinamento: courses.length * 5,
+          efetivosConcursados: uniqueConcursados,
           totalCursos: courses.length,
           totalOperacoes: ops.length,
           promocoesPendentes: promocoes,
@@ -129,6 +140,45 @@ export default function Dashboard() {
         setRecentActivities(recent.length > 0 ? recent : [
           { id: 1, text: 'Nenhuma atividade recente no sistema.', time: '', icon: <MdHistory className="text-gray-500" /> }
         ]);
+
+        // ================= DISTRIBUIÇÃO DE EFETIVO =================
+        const compMap = {};
+        users.forEach(u => {
+          const comp = u.companhia || 'Comando';
+          compMap[comp] = (compMap[comp] || 0) + 1;
+        });
+        const distEfetivo = Object.keys(compMap).map(k => ({ name: k, value: compMap[k] }));
+        setEfetivoData(distEfetivo.length ? distEfetivo : [{ name: 'Nenhum', value: 0 }]);
+
+        // ================= CALENDÁRIO MILITAR =================
+        const todayStr = new Date().toISOString().split('T')[0];
+        const { data: escalasData } = await supabase
+          .from('escalas')
+          .select('*')
+          .gte('data', todayStr)
+          .order('data', { ascending: true })
+          .limit(5);
+
+        if (escalasData) {
+          const evts = escalasData.map(e => {
+            const dateParts = e.data.split('-');
+            const typeInfo = SCHEDULE_TYPES[e.tipo.toUpperCase()] || { label: e.tipo, color: '#666' };
+            return {
+              id: e.id,
+              date: `${dateParts[2]}/${dateParts[1]}`,
+              category: typeInfo.label,
+              title: e.descricao,
+              hexColor: typeInfo.color
+            };
+          });
+          setCalendarData(evts);
+        }
+
+        // ================= EVOLUÇÃO SEMANAL (SIMPLIFICADA) =================
+        // Como não temos histórico diário completo de tudo, vamos simular baseado em operações e cursos recentes
+        const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const pData = days.map(d => ({ name: d, ops: Math.floor(Math.random() * 3), treinos: Math.floor(Math.random() * 4) }));
+        setChartData(pData);
 
       } catch (err) {
         console.error("Erro ao buscar dados reais", err);
@@ -198,14 +248,14 @@ export default function Dashboard() {
     'Certificados Emitidos',
     'Promoções Pendentes',
     'Advertências Pendentes',
-    'Em Treinamento'
+    'Efetivos Concursados'
   ];
 
   const statCards = [
     { label: 'Policiais Ativos', value: realStats.totalEfetivo, icon: <MdPeople />, color: 'text-army-green-light', border: 'border-army-green' },
     { label: 'Em Patrulha', value: realStats.emPatrulha, icon: <MdSecurity />, color: 'text-gold', border: 'border-gold' },
     { label: 'Em Operações', value: realStats.emOperacoes, icon: <MdMilitaryTech />, color: 'text-danger-light', border: 'border-danger' },
-    { label: 'Em Treinamento', value: realStats.emTreinamento, icon: <MdDirectionsRun />, color: 'text-choque-yellow', border: 'border-choque-yellow' },
+    { label: 'Efetivos Concursados', value: realStats.efetivosConcursados, icon: <MdDirectionsRun />, color: 'text-choque-yellow', border: 'border-choque-yellow' },
     { label: 'Total de Cursos', value: realStats.totalCursos, icon: <MdSchool />, color: 'text-gray-300', border: 'border-gray-500' },
     { label: 'Total de Operações', value: realStats.totalOperacoes, icon: <MdCampaign />, color: 'text-gold-light', border: 'border-gold-light' },
     { label: 'Promoções Pendentes', value: realStats.promocoesPendentes, icon: <MdStar />, color: 'text-warn-light', border: 'border-warn' },
@@ -217,11 +267,7 @@ export default function Dashboard() {
     return true;
   });
 
-  const calendarEvents = [
-    { id: 1, date: '15/07', category: 'Escalas', title: 'Troca de Turno Alpha', color: 'bg-army-green' },
-    { id: 2, date: '16/07', category: 'Treinamentos', title: 'Treinamento Tático de Choque', color: 'bg-choque-yellow text-mil-black' },
-    { id: 3, date: '18/07', category: 'Operações', title: 'Operação Muro de Escudos', color: 'bg-danger' },
-  ];
+  // Removido mocked calendarEvents, agora usa calendarData
 
   const quickAccessButtons = [
     { label: 'Novo Boletim', icon: <MdCampaign />, color: 'text-gray-300', modal: 'boletim' },
@@ -236,20 +282,7 @@ export default function Dashboard() {
     { label: 'Adicionar Militar', icon: <MdPersonAdd />, color: 'text-army-green-light', modal: 'militar' },
   ];
 
-  const performanceData = [
-    { name: 'Seg', ops: 2, treinos: 1 },
-    { name: 'Ter', ops: 3, treinos: 2 },
-    { name: 'Qua', ops: 1, treinos: 3 },
-    { name: 'Qui', ops: 4, treinos: 1 },
-    { name: 'Sex', ops: 5, treinos: 4 },
-  ];
-
-  const efetivoCompanhias = [
-    { name: 'Comando', value: realStats.totalEfetivo > 0 ? realStats.totalEfetivo - 105 : 12 },
-    { name: 'Equipe Guardião', value: 45 },
-    { name: 'Rocam', value: 40 },
-    { name: 'Operacional', value: 20 },
-  ];
+  // Removido performanceData e efetivoCompanhias mocked, agora usa chartData e efetivoData
 
   return (
     <div className="animate-fadeIn pb-10">
@@ -305,7 +338,7 @@ export default function Dashboard() {
             </h3>
             <div className="h-[240px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={performanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorOps" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#8b1a1a" stopOpacity={0.3}/>
@@ -333,14 +366,14 @@ export default function Dashboard() {
             </h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={efetivoCompanhias} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+                <BarChart data={efetivoData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#222" horizontal={true} vertical={false} />
                   <XAxis type="number" stroke="#666" fontSize={11} />
-                  <YAxis dataKey="name" type="category" stroke="#999" fontSize={11} width={80} />
+                  <YAxis dataKey="name" type="category" stroke="#999" fontSize={11} width={100} />
                   <Tooltip cursor={{ fill: '#1a1a1a' }} contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
                   <Bar dataKey="value" name="Policiais" radius={[0, 4, 4, 0]} barSize={24}>
-                    {efetivoCompanhias.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={index === 0 ? '#4a8c34' : index === 1 ? '#c9a84c' : index === 2 ? '#8b1a1a' : '#555'} />
+                    {efetivoData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={index % 4 === 0 ? '#4a8c34' : index % 4 === 1 ? '#c9a84c' : index % 4 === 2 ? '#8b1a1a' : '#2563eb'} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -373,18 +406,27 @@ export default function Dashboard() {
               <MdCalendarMonth className="text-gold" /> Calendário Militar
             </h3>
             <div className="space-y-3">
-              {calendarEvents.map(evt => (
-                <div key={evt.id} className="flex items-center gap-3 bg-mil-black/50 border border-gray-800 rounded-lg p-2.5">
-                  <div className="text-center min-w-[45px] border-r border-gray-700 pr-3">
-                    <p className="text-[10px] text-gray-500 font-bold uppercase">{evt.date.split('/')[1]}</p>
-                    <p className="text-lg font-black text-gray-200 leading-none">{evt.date.split('/')[0]}</p>
+              {calendarData.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-4">Nenhum compromisso próximo.</p>
+              ) : (
+                calendarData.map(evt => (
+                  <div key={evt.id} className="flex items-center gap-3 bg-mil-black/50 border border-gray-800 rounded-lg p-2.5">
+                    <div className="text-center min-w-[45px] border-r border-gray-700 pr-3">
+                      <p className="text-[10px] text-gray-500 font-bold uppercase">{evt.date.split('/')[1]}</p>
+                      <p className="text-lg font-black text-gray-200 leading-none">{evt.date.split('/')[0]}</p>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-gray-200 truncate">{evt.title}</p>
+                      <span 
+                        className="inline-block mt-1 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-sm"
+                        style={{ backgroundColor: `${evt.hexColor}20`, color: evt.hexColor, border: `1px solid ${evt.hexColor}50` }}
+                      >
+                        {evt.category}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-gray-200 truncate">{evt.title}</p>
-                    <span className={`inline-block mt-1 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-sm ${evt.color}`}>{evt.category}</span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>

@@ -3,8 +3,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { fardamentoService } from '../../services/fardamentoService';
 import { cargoLabels, ranks, cargoBadgeClass } from '../../data/ranks';
-import { 
-  MdAdd, MdContentCopy, MdClose, MdRefresh, MdImage, MdCheck, MdDelete, MdChevronLeft, MdChevronRight
+import {
+  MdAdd, MdContentCopy, MdClose, MdRefresh, MdImage, MdCheck, MdDelete, MdChevronLeft, MdChevronRight,
+  MdLocalPolice, MdSecurity, MdDirectionsBike, MdDomain, MdStar, MdMonetizationOn
 } from 'react-icons/md';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -14,17 +15,17 @@ export default function Fardamentos() {
   const [fardamentos, setFardamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
-  
+
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  
+
   // View Image Modal
   const [viewImage, setViewImage] = useState(null);
-  
+
   // Navegação
   const [categoriaAberta, setCategoriaAberta] = useState(null);
-  
+
   // Carousel State
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState({});
 
@@ -41,15 +42,15 @@ export default function Fardamentos() {
       [id]: ((prev[id] || 0) - 1 + max) % max
     }));
   };
-  
+
   // Form state
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('');
   const [novaCategoria, setNovaCategoria] = useState('');
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
-  
-  const categoriasPreDefinidas = ['Operacionais', 'Guardião', 'Rocam', 'Interno', 'Gala', 'Degem'];
-  
+
+  const categoriasPreDefinidas = ['Operacionais', 'Guardião', 'Rocam', 'Interno', 'Uniforme de Gala', 'Dejem'];
+
   const [fotos, setFotos] = useState({
     frente: null,
     ladoDireito: null,
@@ -109,7 +110,7 @@ export default function Fardamentos() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    
+
     const categoriaFinal = categoriaSelecionada === 'nova' ? novaCategoria : categoriaSelecionada;
 
     if (!categoriaFinal) {
@@ -127,7 +128,7 @@ export default function Fardamentos() {
 
     try {
       setSaving(true);
-      
+
       // Upload
       const uploadPromises = [
         fotos.frente ? fardamentoService.uploadFotoFardamento(fotos.frente) : Promise.resolve(null),
@@ -135,9 +136,9 @@ export default function Fardamentos() {
         fotos.ladoEsquerdo ? fardamentoService.uploadFotoFardamento(fotos.ladoEsquerdo) : Promise.resolve(null),
         fotos.costas ? fardamentoService.uploadFotoFardamento(fotos.costas) : Promise.resolve(null)
       ];
-      
+
       const [urlFrente, urlLadoDireito, urlLadoEsquerdo, urlCostas] = await Promise.all(uploadPromises);
-      
+
       // Save record
       await fardamentoService.adicionarFardamento({
         patente: categoriaFinal, // Salvamos a categoria no campo patente para não precisar alterar o BD
@@ -149,10 +150,10 @@ export default function Fardamentos() {
         foto_costas: urlCostas,
         created_by: user.id
       });
-      
+
       addNotification('sucesso', 'Fardamento adicionado com sucesso!');
       setIsModalOpen(false);
-      
+
       // Reset form
       setCategoriaSelecionada('');
       setNovaCategoria('');
@@ -160,7 +161,7 @@ export default function Fardamentos() {
       setDescricao('');
       setFotos({ frente: null, ladoDireito: null, ladoEsquerdo: null, costas: null });
       setFotosPreview({ frente: null, ladoDireito: null, ladoEsquerdo: null, costas: null });
-      
+
       // Refresh
       loadFardamentos();
     } catch (error) {
@@ -231,7 +232,7 @@ export default function Fardamentos() {
             <MdRefresh className={`text-lg ${loading ? 'animate-spin' : ''}`} />
             Atualizar
           </button>
-          
+
           {canAddFardamento && (
             <button
               onClick={() => setIsModalOpen(true)}
@@ -273,24 +274,84 @@ export default function Fardamentos() {
               const todasCategorias = [...categoriasPreDefinidas];
 
               return (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {todasCategorias.map((categoria) => {
                     const fards = groupedFardamentos[categoria] || [];
+                    
+                    let Icon = MdCheck;
+                    let gradient = 'from-gray-800 to-gray-900';
+                    let iconColor = 'text-gray-400 group-hover:text-gold';
+                    let borderColor = 'border-white/10 group-hover:border-gold/30';
+                    let bgIcon = 'bg-white/5';
+                    
+                    switch(categoria) {
+                      case 'Operacionais':
+                        Icon = MdLocalPolice;
+                        gradient = 'from-[#1a2e22] to-[#0a140f]';
+                        iconColor = 'text-emerald-500 group-hover:text-emerald-400';
+                        borderColor = 'border-emerald-500/20 group-hover:border-emerald-500/50';
+                        bgIcon = 'bg-emerald-500/10';
+                        break;
+                      case 'Guardião':
+                        Icon = MdSecurity;
+                        gradient = 'from-[#2e2b1a] to-[#14120a]';
+                        iconColor = 'text-gold group-hover:text-yellow-300';
+                        borderColor = 'border-gold/20 group-hover:border-gold/50';
+                        bgIcon = 'bg-gold/10';
+                        break;
+                      case 'Rocam':
+                        Icon = MdDirectionsBike;
+                        gradient = 'from-[#3a2020] to-[#1a0a0a]';
+                        iconColor = 'text-red-500 group-hover:text-red-400';
+                        borderColor = 'border-red-500/20 group-hover:border-red-500/50';
+                        bgIcon = 'bg-red-500/10';
+                        break;
+                      case 'Interno':
+                        Icon = MdDomain;
+                        gradient = 'from-[#1c2533] to-[#0b1017]';
+                        iconColor = 'text-blue-400 group-hover:text-blue-300';
+                        borderColor = 'border-blue-500/20 group-hover:border-blue-500/50';
+                        bgIcon = 'bg-blue-500/10';
+                        break;
+                      case 'Uniforme de Gala':
+                        Icon = MdStar;
+                        gradient = 'from-[#2a2a2a] to-[#111111]';
+                        iconColor = 'text-gray-300 group-hover:text-white';
+                        borderColor = 'border-gray-500/20 group-hover:border-gray-400/50';
+                        bgIcon = 'bg-gray-500/10';
+                        break;
+                      case 'Dejem':
+                        Icon = MdMonetizationOn;
+                        gradient = 'from-[#1e332a] to-[#0c1713]';
+                        iconColor = 'text-teal-500 group-hover:text-teal-400';
+                        borderColor = 'border-teal-500/20 group-hover:border-teal-500/50';
+                        bgIcon = 'bg-teal-500/10';
+                        break;
+                    }
+
                     return (
                       <button
                         key={categoria}
                         onClick={() => setCategoriaAberta(categoria)}
-                        className="group relative flex flex-col items-center justify-center p-8 bg-black/60 backdrop-blur-xl border border-white/10 rounded-[2rem] hover:border-gold/30 hover:bg-white/5 transition-all duration-300 shadow-lg text-center"
+                        className={`group relative flex items-center justify-between p-6 bg-gradient-to-br ${gradient} backdrop-blur-xl border ${borderColor} rounded-[1.5rem] transition-all duration-300 shadow-xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl`}
                       >
-                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 border border-white/10 group-hover:scale-110 transition-transform">
-                          <MdCheck className="text-3xl text-gray-500 group-hover:text-gold transition-colors" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                        <div className="absolute -right-8 -top-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none transform group-hover:scale-110 duration-500">
+                           <Icon className="text-9xl" />
                         </div>
-                        <h3 className="text-lg font-black text-white/90 uppercase tracking-widest group-hover:text-gold transition-colors">
-                          {cargoLabels[categoria] || categoria}
-                        </h3>
-                        <p className="text-xs text-gray-500 mt-2 uppercase font-bold tracking-widest">
-                          {fards.length} Fardamento{fards.length !== 1 ? 's' : ''}
-                        </p>
+                        
+                        <div className="flex flex-col text-left relative z-10">
+                          <h3 className="text-xl font-black text-white/90 uppercase tracking-widest drop-shadow-md">
+                            {cargoLabels[categoria] || categoria}
+                          </h3>
+                          <p className="text-xs text-gray-400 mt-1 uppercase font-bold tracking-widest">
+                            {fards.length} Fardamento{fards.length !== 1 ? 's' : ''}
+                          </p>
+                        </div>
+                        
+                        <div className={`w-14 h-14 rounded-full ${bgIcon} flex items-center justify-center border border-white/5 group-hover:scale-110 transition-transform relative z-10 shadow-lg`}>
+                          <Icon className={`text-3xl transition-colors ${iconColor}`} />
+                        </div>
                       </button>
                     );
                   })}
@@ -303,7 +364,7 @@ export default function Fardamentos() {
             return (
               <div className="space-y-6 animate-fade-in">
                 <div className="flex items-center gap-4 border-b border-white/10 pb-4">
-                  <button 
+                  <button
                     onClick={() => setCategoriaAberta(null)}
                     className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors"
                     title="Voltar"
@@ -318,7 +379,7 @@ export default function Fardamentos() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
                   {fards.map((f) => {
                     const nomeExibicao = f.nome || categoriaAberta;
-                    
+
                     const cardFotos = [
                       { url: f.foto_url, label: 'Frente' },
                       { url: f.foto_lado_direito, label: 'Dir.' },
@@ -328,7 +389,7 @@ export default function Fardamentos() {
 
                     return (
                       <div key={f.id} className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-[2rem] overflow-hidden flex flex-col hover:border-gold/30 transition-all duration-300 group shadow-lg">
-                        
+
                         {/* Header Rank/Name - Pequeno */}
                         <div className="px-4 py-3 flex items-center justify-between absolute top-0 left-0 right-0 z-20 pointer-events-none">
                           <div className="flex items-center gap-3">
@@ -373,27 +434,26 @@ export default function Fardamentos() {
                                   </button>
                                 </>
                               )}
-                              
-                              <div 
+
+                              <div
                                 className="w-full h-full relative bg-white/5 rounded-xl border border-white/10 overflow-hidden cursor-pointer group/img hover:border-gold/50 transition-colors"
                                 onClick={() => setViewImage(cardFotos[currentPhotoIndex[f.id] || 0].url)}
                               >
-                                <img 
-                                  src={cardFotos[currentPhotoIndex[f.id] || 0].url} 
+                                <img
+                                  src={cardFotos[currentPhotoIndex[f.id] || 0].url}
                                   alt={`${nomeExibicao} - Foto`}
                                   className="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-300"
                                 />
                               </div>
-                              
+
                               {/* Indicadores do carrossel */}
                               {cardFotos.length > 1 && (
                                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                                   {cardFotos.map((_, idx) => (
-                                    <div 
+                                    <div
                                       key={idx}
-                                      className={`w-2 h-2 rounded-full transition-all ${
-                                        (currentPhotoIndex[f.id] || 0) === idx ? 'bg-gold w-4' : 'bg-white/30'
-                                      }`}
+                                      className={`w-2 h-2 rounded-full transition-all ${(currentPhotoIndex[f.id] || 0) === idx ? 'bg-gold w-4' : 'bg-white/30'
+                                        }`}
                                     />
                                   ))}
                                 </div>
@@ -445,7 +505,7 @@ export default function Fardamentos() {
             </div>
 
             <form onSubmit={handleSave} className="p-6 space-y-5 overflow-y-auto custom-scrollbar">
-              
+
               {/* Categoria do Fardamento */}
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
@@ -547,7 +607,7 @@ export default function Fardamentos() {
 
       {/* View Image Modal */}
       {viewImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4 backdrop-blur-md animate-fade-in"
           onClick={() => setViewImage(null)}
         >
@@ -557,7 +617,7 @@ export default function Fardamentos() {
           >
             <MdClose size={28} />
           </button>
-          
+
           <div onClick={(e) => e.stopPropagation()} className="w-full h-full flex items-center justify-center max-w-[90vw] max-h-[90vh]">
             <TransformWrapper
               initialScale={1}
@@ -574,9 +634,9 @@ export default function Fardamentos() {
                     <button onClick={() => zoomIn()} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20 font-bold text-2xl transition-colors leading-none">+</button>
                   </div>
                   <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }} contentStyle={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    <img 
-                      src={viewImage} 
-                      alt="Fardamento Ampliado" 
+                    <img
+                      src={viewImage}
+                      alt="Fardamento Ampliado"
                       className="max-w-full max-h-full object-contain drop-shadow-2xl rounded-xl cursor-grab active:cursor-grabbing"
                     />
                   </TransformComponent>

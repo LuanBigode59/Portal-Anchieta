@@ -154,6 +154,9 @@ export default function CourseDetails() {
             <span className="text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-full border border-gold/50 text-gold bg-gold/10 uppercase">
               {course.categoria || 'GERAL'}
             </span>
+            <span className="text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-full border border-gold/50 text-gold bg-gold/10 uppercase">
+              {course.dificuldade || 'Básico'}
+            </span>
             <span className="text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-full border border-mil-border-light text-gray-400 bg-mil-card/50 uppercase">
               {course.qtd_modulos || 1} Módulos
             </span>

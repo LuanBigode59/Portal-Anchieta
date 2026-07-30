@@ -61,6 +61,7 @@ export default function ManageCourses() {
     qtd_modulos: 1,
     categoria: '',
     nota_minima: 0,
+    dificuldade: 'Básico',
     status: true
   });
 
@@ -96,6 +97,7 @@ export default function ManageCourses() {
         qtd_modulos: course.qtd_modulos || 1,
         categoria: course.categoria || '',
         nota_minima: course.nota_minima || 0,
+        dificuldade: course.dificuldade || 'Básico',
         status: course.status
       });
     } else {
@@ -103,7 +105,7 @@ export default function ManageCourses() {
       setFormData({
         nome: '', descricao: '', carga_horaria: 0, instrutor: '',
         imagem_url: '', video_url: '', pdf_url: '', slides_url: '',
-        icone: 'MdSchool', qtd_modulos: 1, categoria: '', nota_minima: 0, status: true
+        icone: 'MdSchool', qtd_modulos: 1, categoria: '', nota_minima: 0, dificuldade: 'Básico', status: true
       });
     }
     setCourseFiles({ imagem: null, video: null, pdf: null, slides: null });
@@ -466,6 +468,21 @@ export default function ManageCourses() {
                     {COURSE_CATEGORIES.map(cat => (
                       <option key={cat.id} value={cat.id}>{cat.label}</option>
                     ))}
+                  </select>
+                </div>
+
+                {/* Dificuldade */}
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Grau de Dificuldade</label>
+                  <select
+                    name="dificuldade"
+                    value={formData.dificuldade}
+                    onChange={handleChange}
+                    className="mil-input appearance-none cursor-pointer"
+                  >
+                    <option value="Básico">Básico</option>
+                    <option value="Intermediário">Intermediário</option>
+                    <option value="Avançado">Avançado</option>
                   </select>
                 </div>
 

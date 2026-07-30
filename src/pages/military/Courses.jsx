@@ -68,7 +68,7 @@ export default function Courses() {
                       Disponível
                     </span>
                     <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-[3px] rounded border border-[#4a4020] text-gold bg-[#1a1608]">
-                      Básico
+                      {course.dificuldade || 'Básico'}
                     </span>
                   </div>
                 </div>

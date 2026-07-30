@@ -6,7 +6,8 @@ import {
   MdDashboard, MdPeople, MdSchool, MdQuiz, MdAssignment, MdLeaderboard,
   MdAdminPanelSettings, MdLogout, MdMenu, MdClose, MdStar, MdAssessment,
   MdSettings, MdDescription, MdCalendarMonth, MdMilitaryTech, MdCampaign,
-  MdChat, MdBarChart, MdNotifications, MdPerson, MdGavel, MdAccessTime, MdCheckroom
+  MdChat, MdBarChart, MdNotifications, MdPerson, MdGavel, MdAccessTime, MdCheckroom,
+  MdThumbUp, MdFeedback, MdLightbulb
 } from 'react-icons/md';
 import { GiMilitaryFort, GiMedal } from 'react-icons/gi';
 import { useState, useEffect } from 'react';
@@ -39,6 +40,34 @@ export default function Sidebar() {
     }
   }, [user, sendNotification]);
 
+  useEffect(() => {
+    const checkTodaySchedule = async () => {
+      if (!user) return;
+      const todayStr = new Date().toISOString().split('T')[0];
+      const hasShown = sessionStorage.getItem(`shownSchedule_${todayStr}`);
+      
+      if (!hasShown) {
+        try {
+          const { data, error } = await supabase
+            .from('escalas')
+            .select('*')
+            .eq('data', todayStr);
+            
+          if (!error && data && data.length > 0) {
+            data.forEach(item => {
+              sendNotification(`AVISO DE HOJE: ${item.descricao}`, 'info');
+            });
+            sessionStorage.setItem(`shownSchedule_${todayStr}`, 'true');
+          }
+        } catch (err) {
+          console.error('Erro ao buscar escalas do dia', err);
+        }
+      }
+    };
+    
+    checkTodaySchedule();
+  }, [user, sendNotification]);
+
   const militaryLinks = [
     { to: '/militar/dashboard', icon: <MdDashboard />, label: 'Dashboard' },
     { to: '/militar/ponto', icon: <MdAccessTime />, label: 'Bater Ponto' },
@@ -54,6 +83,9 @@ export default function Sidebar() {
       : []),
     { to: '/militar/boletins', icon: <MdCampaign />, label: 'Mural' },
     { to: '/militar/medalhas', icon: <GiMedal />, label: 'Medalhas' },
+    { to: '/militar/elogios', icon: <MdThumbUp />, label: 'Elogios' },
+    { to: '/militar/reclamacoes', icon: <MdFeedback />, label: 'Reclamações' },
+    { to: '/militar/sugestoes', icon: <MdLightbulb />, label: 'Sugestões' },
     { to: '/militar/ranking', icon: <MdLeaderboard />, label: 'Ranking' },
     { to: '/militar/estatisticas', icon: <MdBarChart />, label: 'Estatísticas' },
     { to: '/militar/chat', icon: <MdChat />, label: 'Chat' },

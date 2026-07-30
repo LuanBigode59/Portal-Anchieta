@@ -90,9 +90,11 @@ export default function ManageExams() {
       perguntas: [
         ...formData.perguntas,
         {
+          tipo: 'alternativas',
           pergunta: 'Nova Pergunta',
           alternativas: ['Opção A', 'Opção B', 'Opção C', 'Opção D'],
-          corretaIndex: 0
+          corretaIndex: 0,
+          respostaCorretaTexto: ''
         }
       ]
     });
@@ -381,29 +383,56 @@ export default function ManageExams() {
                           />
                         </div>
 
-                        <div className="space-y-2">
-                          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Alternativas (Marque a Correta)</label>
-                          {q.alternativas.map((alt, aIndex) => (
-                            <div key={aIndex} className={`flex items-center gap-3 p-2 rounded-lg border ${q.corretaIndex === aIndex ? 'bg-army-green/10 border-army-green/50' : 'bg-[#0a0a0a] border-gray-800'}`}>
-                              <input 
-                                type="radio" 
-                                name={`correta-${qIndex}`} 
-                                checked={q.corretaIndex === aIndex}
-                                onChange={() => handleQuestionChange(qIndex, 'corretaIndex', aIndex)}
-                                className="text-army-green focus:ring-army-green"
-                                required
-                              />
-                              <input 
-                                type="text" 
-                                value={alt} 
-                                onChange={(e) => handleAlternativeChange(qIndex, aIndex, e.target.value)}
-                                className="flex-1 bg-transparent border-none text-xs text-gray-300 focus:ring-0 px-2"
-                                placeholder={`Alternativa ${['A', 'B', 'C', 'D'][aIndex]}`}
-                                required
-                              />
-                            </div>
-                          ))}
+                        <div className="mb-4">
+                          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Tipo de Resposta</label>
+                          <select 
+                            value={q.tipo || 'alternativas'} 
+                            onChange={(e) => handleQuestionChange(qIndex, 'tipo', e.target.value)}
+                            className="mil-select"
+                          >
+                            <option value="alternativas">Múltipla Escolha (Alternativas)</option>
+                            <option value="texto">Resposta em Texto</option>
+                          </select>
                         </div>
+
+                        {(!q.tipo || q.tipo === 'alternativas') ? (
+                          <div className="space-y-2">
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Alternativas (Marque a Correta)</label>
+                            {q.alternativas?.map((alt, aIndex) => (
+                              <div key={aIndex} className={`flex items-center gap-3 p-2 rounded-lg border ${q.corretaIndex === aIndex ? 'bg-army-green/10 border-army-green/50' : 'bg-[#0a0a0a] border-gray-800'}`}>
+                                <input 
+                                  type="radio" 
+                                  name={`correta-${qIndex}`} 
+                                  checked={q.corretaIndex === aIndex}
+                                  onChange={() => handleQuestionChange(qIndex, 'corretaIndex', aIndex)}
+                                  className="text-army-green focus:ring-army-green"
+                                  required={!q.tipo || q.tipo === 'alternativas'}
+                                />
+                                <input 
+                                  type="text" 
+                                  value={alt} 
+                                  onChange={(e) => handleAlternativeChange(qIndex, aIndex, e.target.value)}
+                                  className="flex-1 bg-transparent border-none text-xs text-gray-300 focus:ring-0 px-2"
+                                  placeholder={`Alternativa ${['A', 'B', 'C', 'D'][aIndex]}`}
+                                  required={!q.tipo || q.tipo === 'alternativas'}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Resposta Correta Esperada</label>
+                            <input 
+                              type="text" 
+                              value={q.respostaCorretaTexto || ''} 
+                              onChange={(e) => handleQuestionChange(qIndex, 'respostaCorretaTexto', e.target.value)}
+                              className="mil-input"
+                              placeholder="Digite a resposta correta..."
+                              required={q.tipo === 'texto'}
+                            />
+                            <p className="text-[10px] text-gray-500">A resposta do aluno deve ser exatamente igual (ignorando maiúsculas/minúsculas) para ser considerada correta.</p>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
