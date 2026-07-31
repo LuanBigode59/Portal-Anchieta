@@ -5,7 +5,7 @@ import { fardamentoService } from '../../services/fardamentoService';
 import { cargoLabels, ranks, cargoBadgeClass } from '../../data/ranks';
 import {
   MdAdd, MdContentCopy, MdClose, MdRefresh, MdImage, MdCheck, MdDelete, MdChevronLeft, MdChevronRight,
-  MdLocalPolice, MdSecurity, MdDirectionsBike, MdDomain, MdStar, MdMonetizationOn
+  MdLocalPolice, MdSecurity, MdTwoWheeler, MdDomain, MdStar, MdBadge
 } from 'react-icons/md';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -300,7 +300,7 @@ export default function Fardamentos() {
                         bgIcon = 'bg-gold/10';
                         break;
                       case 'Rocam':
-                        Icon = MdDirectionsBike;
+                        Icon = MdTwoWheeler;
                         gradient = 'from-[#3a2020] to-[#1a0a0a]';
                         iconColor = 'text-red-500 group-hover:text-red-400';
                         borderColor = 'border-red-500/20 group-hover:border-red-500/50';
@@ -321,7 +321,7 @@ export default function Fardamentos() {
                         bgIcon = 'bg-gray-500/10';
                         break;
                       case 'Dejem':
-                        Icon = MdMonetizationOn;
+                        Icon = MdBadge;
                         gradient = 'from-[#1e332a] to-[#0c1713]';
                         iconColor = 'text-teal-500 group-hover:text-teal-400';
                         borderColor = 'border-teal-500/20 group-hover:border-teal-500/50';

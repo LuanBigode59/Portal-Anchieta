@@ -55,6 +55,7 @@ import EditMilitar from './pages/admin/EditMilitar';
 import ManageSignatures from './pages/admin/ManageSignatures';
 import ManageExonerated from './pages/admin/ManageExonerated';
 import ManageMedals from './pages/admin/ManageMedals';
+import ManageGallery from './pages/admin/ManageGallery';
 
 // Corregedoria Pages
 import CorregedoriaLayout from './components/layout/CorregedoriaLayout';
@@ -145,6 +146,7 @@ export default function App() {
             <Route path="assinaturas" element={<ManageSignatures />} />
             <Route path="exonerados" element={<ManageExonerated />} />
             <Route path="medalhas" element={<ManageMedals />} />
+            <Route path="galeria" element={<ManageGallery />} />
           </Route>
 
           {/* Protected Corregedoria Area */}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Topbar from '../../components/layout/Topbar';
 import { userService } from '../../services/userService';
-import { MdPeople, MdSchool, MdQuiz, MdStar, MdGavel, MdMilitaryTech, MdArrowForward, MdCampaign, MdSettings, MdBlock } from 'react-icons/md';
+import { MdPeople, MdSchool, MdQuiz, MdStar, MdGavel, MdMilitaryTech, MdArrowForward, MdCampaign, MdSettings, MdBlock, MdPhotoLibrary } from 'react-icons/md';
 import { GiMedal } from 'react-icons/gi';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,6 +29,7 @@ export default function AdminPanel() {
     { to: '/admin/provas', label: 'Gerenciar Provas', desc: 'Criar provas e banco de questões', icon: <MdQuiz />, color: 'text-gold-light', border: 'border-gold-light/30' },
     { to: '/admin/operacoes', label: 'Gerenciar Operações', desc: 'Cadastrar e acompanhar operações', icon: <MdMilitaryTech />, color: 'text-danger-light', border: 'border-danger/30' },
     { to: '/admin/medalhas', label: 'Gerenciar Medalhas', desc: 'Editar medalhas e requisitos', icon: <GiMedal />, color: 'text-gold', border: 'border-gold/30' },
+    { to: '/admin/galeria', label: 'Gerenciar Galeria', desc: 'Atualizar estatísticas e fotos', icon: <MdPhotoLibrary />, color: 'text-gray-300', border: 'border-gray-500/30' },
     { to: '/admin/exonerados', label: 'Exonerados', desc: 'Gerenciar militares desligados do batalhão', icon: <MdBlock />, color: 'text-danger', border: 'border-danger/50' },
   ];
 

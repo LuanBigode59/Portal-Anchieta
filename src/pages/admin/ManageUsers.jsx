@@ -144,6 +144,9 @@ export default function ManageUsers() {
                 </div>
                 <h3 className="text-[15px] font-black text-gray-100 truncate">{militar.nome}</h3>
                 <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mt-0.5">ID: {militar.cpf}</p>
+                <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mt-0.5">
+                  Ingresso: {militar.created_at ? new Date(militar.created_at).toLocaleDateString('pt-BR') : 'N/D'}
+                </p>
               </div>
 
               {/* Body Card */}

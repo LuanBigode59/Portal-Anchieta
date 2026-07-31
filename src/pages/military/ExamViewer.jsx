@@ -86,8 +86,8 @@ export default function ExamViewer() {
         }
       });
 
-      // Enviar notificação no Discord (Webhook Privado)
-      const webhookUrl = "https://discord.com/api/webhooks/1528989572518641716/LvONcKop1YTwG51KPbOHf-Qf6_MYxaspP5tuuMeGrkVjCblpB6ajMGAyyADLWOPd9KQn";
+      // Enviar notificação no Discord (Webhook Privado) via CORS proxy
+      const webhookUrl = "https://corsproxy.io/?" + encodeURIComponent("https://discord.com/api/webhooks/1528989572518641716/LvONcKop1YTwG51KPbOHf-Qf6_MYxaspP5tuuMeGrkVjCblpB6ajMGAyyADLWOPd9KQn");
       fetch(webhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -211,8 +211,8 @@ export default function ExamViewer() {
           }
         });
 
-        // Enviar webhook no Discord para os admins
-        const webhookUrl = "https://discord.com/api/webhooks/1528989572518641716/LvONcKop1YTwG51KPbOHf-Qf6_MYxaspP5tuuMeGrkVjCblpB6ajMGAyyADLWOPd9KQn";
+        // Enviar webhook no Discord para os admins via CORS proxy
+        const webhookUrl = "https://corsproxy.io/?" + encodeURIComponent("https://discord.com/api/webhooks/1528989572518641716/LvONcKop1YTwG51KPbOHf-Qf6_MYxaspP5tuuMeGrkVjCblpB6ajMGAyyADLWOPd9KQn");
         fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

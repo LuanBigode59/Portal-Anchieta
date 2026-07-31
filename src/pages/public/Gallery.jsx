@@ -1,17 +1,39 @@
-import { GiMilitaryFort } from 'react-icons/gi';
-import { MdPhotoLibrary } from 'react-icons/md';
+import { useState, useEffect } from 'react';
+import { galleryService } from '../../services/galleryService';
 
 export default function Gallery() {
-  const categories = [
-    { label: 'Operações', count: 12 },
-    { label: 'Treinamentos', count: 8 },
-    { label: 'Eventos', count: 6 },
-    { label: 'Formatura', count: 4 },
-  ];
+  const [categories, setCategories] = useState([
+    { id: 'operacoes', label: 'Operações', count: 0 },
+    { id: 'treinamentos', label: 'Treinamentos', count: 0 },
+    { id: 'eventos', label: 'Eventos', count: 0 },
+    { id: 'formatura', label: 'Formatura', count: 0 },
+  ]);
+  const [imagePaths, setImagePaths] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const images = import.meta.glob('/src/assets/galeria/*.{png,jpg,jpeg,webp}', { eager: true });
-  const imagePaths = Object.values(images).map(module => module.default);
-
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [statsData, imagesData] = await Promise.all([
+          galleryService.getStats(),
+          galleryService.getImages()
+        ]);
+        
+        if (statsData && statsData.length > 0) {
+          setCategories(statsData);
+        }
+        
+        if (imagesData) {
+          setImagePaths(imagesData.map(img => img.url));
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados da galeria:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   return (
     <div className="pt-24 pb-16 min-h-screen">
@@ -39,20 +61,24 @@ export default function Gallery() {
         </div>
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {imagePaths.length > 0 ? imagePaths.map((src, i) => (
-            <div
-              key={i}
-              className="aspect-[4/3] rounded-xl bg-gradient-to-br from-mil-card to-mil-dark border border-gray-800 overflow-hidden group cursor-pointer hover:border-gold/30 hover:shadow-gold-lg transition-all duration-500"
-            >
-              <img src={src} alt={`Galeria ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-            </div>
-          )) : (
-            <div className="col-span-full py-20 text-center text-gray-500 border border-dashed border-gray-800 rounded-xl">
-              Nenhuma imagem na galeria. Adicione arquivos em src/assets/galeria/
-            </div>
-          )}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-20"><div className="spinner"></div></div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {imagePaths.length > 0 ? imagePaths.map((src, i) => (
+              <div
+                key={i}
+                className="aspect-[4/3] rounded-xl bg-gradient-to-br from-mil-card to-mil-dark border border-gray-800 overflow-hidden group cursor-pointer hover:border-gold/30 hover:shadow-gold-lg transition-all duration-500"
+              >
+                <img src={src} alt={`Galeria ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              </div>
+            )) : (
+              <div className="col-span-full py-20 text-center text-gray-500 border border-dashed border-gray-800 rounded-xl">
+                Nenhuma imagem na galeria.
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="text-center mt-12">
           <p className="text-gray-600 text-sm">
