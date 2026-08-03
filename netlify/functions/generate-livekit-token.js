@@ -1,8 +1,5 @@
-import { AccessToken } from 'livekit-server-sdk';
-import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const livekitApiKey = process.env.LIVEKIT_API_KEY;
 const livekitApiSecret = process.env.LIVEKIT_API_SECRET;
 
@@ -22,11 +19,11 @@ export const handler = async (event, context) => {
     return { statusCode: 405, headers, body: 'Method Not Allowed' };
   }
 
-  if (!supabaseUrl || !livekitApiKey || !livekitApiSecret) {
+  if (!livekitApiKey || !livekitApiSecret) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Server configuration missing' })
+      body: JSON.stringify({ error: 'Server configuration missing: LIVEKIT_API_KEY or LIVEKIT_API_SECRET not set' })
     };
   }
 
@@ -37,24 +34,31 @@ export const handler = async (event, context) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing roomName or identity' }) };
     }
 
-    // Initialize Supabase Client to verify permissions if needed
-    // Assuming auth check is passed here from client, but strictly we should verify the JWT
+    // Build LiveKit JWT token manually using jsonwebtoken
+    // LiveKit uses standard JWT with specific claims for room access
+    const now = Math.floor(Date.now() / 1000);
+    const exp = now + (6 * 60 * 60); // 6 hours expiration
 
-    const at = new AccessToken(livekitApiKey, livekitApiSecret, {
-      identity: identity,
+    const payload = {
+      iss: livekitApiKey,
+      sub: identity,
       name: identity,
-    });
+      nbf: now,
+      exp: exp,
+      iat: now,
+      jti: identity + '-' + now,
+      video: {
+        roomJoin: true,
+        room: roomName,
+        canPublish: true,
+        canSubscribe: true,
+        canPublishData: true,
+      }
+    };
 
-    at.addGrant({ 
-      roomJoin: true, 
-      room: roomName,
-      canPublish: true,
-      canSubscribe: true,
-      canPublishData: true,
-      hidden: isInstructor ? false : false, // Could hide students from each other if needed
+    const token = jwt.sign(payload, livekitApiSecret, {
+      algorithm: 'HS256',
     });
-
-    const token = await at.toJwt();
 
     return {
       statusCode: 200,
