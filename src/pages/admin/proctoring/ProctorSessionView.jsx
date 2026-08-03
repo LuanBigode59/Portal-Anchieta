@@ -345,15 +345,12 @@ export default function ProctorSessionView() {
               <RoomAudioRenderer />
             </LiveKitRoom>
           ) : (
-            <RoomContent 
-              session={session} 
-              dbParticipants={participants} 
-              onApprove={handleApprove}
-              onReject={handleReject}
-              onPause={handlePause}
-              onInvalidate={handleInvalidate}
-              onExpand={() => {}}
-            />
+            <div className="flex justify-center items-center h-full">
+              <div className="text-gray-500 text-center">
+                <div className="spinner mb-4 mx-auto"></div>
+                <p>Conectando ao servidor de supervisão...</p>
+              </div>
+            </div>
           )}
         </div>
       </div>
