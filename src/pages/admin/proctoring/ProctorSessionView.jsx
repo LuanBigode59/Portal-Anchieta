@@ -203,6 +203,7 @@ export default function ProctorSessionView() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState('');
+  const [tokenError, setTokenError] = useState('');
   const [expandedVideo, setExpandedVideo] = useState(null);
 
   const loadData = useCallback(async () => {
@@ -219,10 +220,12 @@ export default function ProctorSessionView() {
       // Get LiveKit token for Instructor
       if (!token && user) {
         try {
+          setTokenError('');
           const t = await proctorService.getLivekitToken(sessionData.room_name, user.id, true);
           setToken(t);
         } catch (e) {
           console.error("LiveKit token error:", e);
+          setTokenError(e.message || "Erro ao obter token do LiveKit.");
         }
       }
     } catch (err) {
@@ -344,6 +347,20 @@ export default function ProctorSessionView() {
               <ExpandedVideoModal expandedVideo={expandedVideo} onClose={() => setExpandedVideo(null)} />
               <RoomAudioRenderer />
             </LiveKitRoom>
+          ) : tokenError ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="text-red-500 text-center max-w-md p-6 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <MdWarning className="text-4xl mx-auto mb-2" />
+                <h3 className="font-bold mb-2">Erro de Conexão</h3>
+                <p className="text-sm mb-4">{tokenError}</p>
+                <p className="text-xs text-red-400 mb-4">
+                  Se você estiver na Netlify, verifique se as variáveis de ambiente LIVEKIT_API_KEY, LIVEKIT_API_SECRET e SUPABASE_SERVICE_ROLE_KEY estão configuradas no painel da Netlify.
+                </p>
+                <button onClick={() => { setTokenError(''); setToken(''); loadData(); }} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-bold text-xs uppercase tracking-widest transition-colors">
+                  Tentar Novamente
+                </button>
+              </div>
+            </div>
           ) : (
             <div className="flex justify-center items-center h-full">
               <div className="text-gray-500 text-center">
