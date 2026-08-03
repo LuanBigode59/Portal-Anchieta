@@ -5,13 +5,7 @@
 [build.environment]
   CI = "false"
 
-# Allow Netlify Functions to work (must come BEFORE SPA catch-all)
-[[redirects]]
-  from = "/.netlify/*"
-  to = "/.netlify/:splat"
-  status = 200
-
-# SPA redirect - all routes go to index.html
+# SPA redirect - all routes go to index.html (Netlify Functions are excluded automatically)
 [[redirects]]
   from = "/*"
   to = "/index.html"
