@@ -7,7 +7,7 @@ import {
   MdAdminPanelSettings, MdLogout, MdMenu, MdClose, MdStar, MdAssessment,
   MdSettings, MdDescription, MdCalendarMonth, MdMilitaryTech, MdCampaign,
   MdChat, MdBarChart, MdNotifications, MdPerson, MdGavel, MdAccessTime, MdCheckroom,
-  MdThumbUp, MdFeedback, MdLightbulb
+  MdThumbUp, MdFeedback, MdLightbulb, MdVideocam
 } from 'react-icons/md';
 import { GiMilitaryFort, GiMedal } from 'react-icons/gi';
 import { useState, useEffect } from 'react';
@@ -103,6 +103,7 @@ export default function Sidebar() {
     ...(user && ['capitao', 'major', 'tenente_coronel'].includes(user.patente?.toLowerCase())
       ? [{ to: '/admin/medalhas', icon: <GiMedal />, label: 'Gerenciar Medalhas' }]
       : []),
+    { to: '/admin/provas/supervisao', icon: <MdVideocam />, label: 'Supervisão de Provas' },
   ];  const showAdmin = isAdmin || isInstrutor || isOfficer || user?.cpf === '41632';  const sidebarContent = (
     <div className="flex flex-col h-full bg-mil-black/90 backdrop-blur-md">
       {/* Header / Emblema */}

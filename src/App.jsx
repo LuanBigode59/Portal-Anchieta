@@ -21,6 +21,7 @@ import Courses from './pages/military/Courses';
 import CourseDetails from './pages/military/CourseDetails';
 import Exams from './pages/military/Exams';
 import ExamViewer from './pages/military/ExamViewer';
+import ExamWaitingRoom from './pages/military/ExamWaitingRoom';
 import Schedule from './pages/military/Schedule';
 import Operations from './pages/military/Operations';
 import Reports from './pages/military/Reports';
@@ -56,6 +57,8 @@ import ManageSignatures from './pages/admin/ManageSignatures';
 import ManageExonerated from './pages/admin/ManageExonerated';
 import ManageMedals from './pages/admin/ManageMedals';
 import ManageGallery from './pages/admin/ManageGallery';
+import ProctorDashboard from './pages/admin/proctoring/ProctorDashboard';
+import ProctorSessionView from './pages/admin/proctoring/ProctorSessionView';
 
 // Corregedoria Pages
 import CorregedoriaLayout from './components/layout/CorregedoriaLayout';
@@ -105,6 +108,7 @@ export default function App() {
             <Route path="cursos/:id" element={<CourseDetails />} />
             <Route path="provas" element={<Exams />} />
             <Route path="provas/:id" element={<ExamViewer />} />
+            <Route path="provas/:id/espera" element={<ExamWaitingRoom />} />
             <Route path="escalas" element={<Schedule />} />
             <Route path="operacoes" element={<Operations />} />
             <Route path="relatorios" element={<Reports />} />
@@ -147,6 +151,8 @@ export default function App() {
             <Route path="exonerados" element={<ManageExonerated />} />
             <Route path="medalhas" element={<ManageMedals />} />
             <Route path="galeria" element={<ManageGallery />} />
+            <Route path="provas/supervisao" element={<ProctorDashboard />} />
+            <Route path="provas/supervisao/:id" element={<ProctorSessionView />} />
           </Route>
 
           {/* Protected Corregedoria Area */}

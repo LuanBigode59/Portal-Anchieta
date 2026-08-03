@@ -539,7 +539,7 @@ export default function CourseDetails() {
                     )}
 
                     <button
-                      onClick={() => navigate(`/militar/provas/${exam.id}`)}
+                      onClick={() => passed ? navigate(`/militar/provas/${exam.id}`) : navigate(`/militar/provas/${exam.id}/espera`)}
                       disabled={passed || isBlocked}
                       className={`btn-gold !py-2 !px-6 !text-[10px] ${passed || isBlocked ? 'opacity-50 cursor-not-allowed grayscale' : ''
                         }`}
