@@ -22,7 +22,7 @@ export const handler = async (event, context) => {
     return { statusCode: 405, headers, body: 'Method Not Allowed' };
   }
 
-  if (!supabaseUrl || !supabaseServiceKey || !livekitApiKey || !livekitApiSecret) {
+  if (!supabaseUrl || !livekitApiKey || !livekitApiSecret) {
     return {
       statusCode: 500,
       headers,
