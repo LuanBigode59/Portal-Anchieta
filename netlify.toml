@@ -5,6 +5,12 @@
 [build.environment]
   CI = "false"
 
+# Allow Netlify Functions to work (must come BEFORE SPA catch-all)
+[[redirects]]
+  from = "/.netlify/*"
+  to = "/.netlify/:splat"
+  status = 200
+
 # SPA redirect - all routes go to index.html
 [[redirects]]
   from = "/*"
@@ -21,7 +27,7 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*; media-src 'self' https://* blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'self' https://*; frame-ancestors 'none'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*; media-src 'self' https://* blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.livekit.cloud wss://*.livekit.cloud; frame-src 'self' https://*; frame-ancestors 'none'"
 
 # Block access to sensitive files
 [[headers]]
